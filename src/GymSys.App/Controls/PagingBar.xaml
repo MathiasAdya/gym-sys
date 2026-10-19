@@ -1,0 +1,18 @@
+<UserControl x:Class="GymSys.App.Controls.PagingBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Bar paging (PRD: 50 baris per halaman). Contoh pakai:
+         <controls:PagingBar PageIndex="{Binding PageIndex, Mode=TwoWay}" PageSize="50"
+                             TotalItems="{Binding TotalItems}" Command="{Binding GoToPageCommand}"/>
+         Command dipanggil dengan nomor halaman baru (int, mulai dari 1). -->
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <Button x:Name="FirstButton" Content="«" Click="OnFirst" MinWidth="36" Padding="10,6" Margin="4,0,0,0" ToolTip="Halaman pertama"/>
+            <Button x:Name="PrevButton" Content="‹" Click="OnPrev" MinWidth="36" Padding="10,6" Margin="4,0,0,0" ToolTip="Sebelumnya"/>
+            <Button x:Name="NextButton" Content="›" Click="OnNext" MinWidth="36" Padding="10,6" Margin="4,0,0,0" ToolTip="Berikutnya"/>
+            <Button x:Name="LastButton" Content="»" Click="OnLast" MinWidth="36" Padding="10,6" Margin="4,0,0,0" ToolTip="Halaman terakhir"/>
+        </StackPanel>
+        <TextBlock x:Name="InfoText" Style="{StaticResource Muted}" VerticalAlignment="Center"/>
+    </DockPanel>
+</UserControl>

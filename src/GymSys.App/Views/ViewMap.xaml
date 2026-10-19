@@ -1,0 +1,35 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:GymSys.App.ViewModels"
+                    xmlns:views="clr-namespace:GymSys.App.Views">
+
+    <!-- Peta ViewModel -> View. Setiap ViewModel baru cukup ditambah satu baris di sini
+         (Anggota 1 & 3: tambahkan milik kalian di bawah penanda ini). -->
+
+    <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+        <views:LoginView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ShellViewModel}">
+        <views:ShellView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+        <views:DashboardView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ReportViewModel}">
+        <views:ReportView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+        <views:SettingsView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PlaceholderViewModel}">
+        <views:PlaceholderView/>
+    </DataTemplate>
+
+    <!-- === Tambahan Anggota 1 / Anggota 3 di bawah ini === -->
+
+</ResourceDictionary>

@@ -1,0 +1,16 @@
+<UserControl x:Class="GymSys.App.Controls.LoadingOverlay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Contoh pakai (taruh di atas konten dalam Grid yang sama):
+         <controls:LoadingOverlay Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/> -->
+    <Grid Background="{DynamicResource OverlayBrush}">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="220">
+            <ProgressBar IsIndeterminate="True" Height="4" BorderThickness="0"
+                         Foreground="{DynamicResource AccentBrush}"
+                         Background="{DynamicResource LineBrush}"/>
+            <TextBlock Text="Memuat data..." Style="{StaticResource Muted}"
+                       HorizontalAlignment="Center" Margin="0,12,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
