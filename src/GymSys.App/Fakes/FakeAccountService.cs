@@ -1,12 +1,13 @@
 using GymSys.Core.Entities;
 using GymSys.Core.Interfaces;
+using GymSys.Core.Services;
 
 namespace GymSys.App.Fakes;
 
 /// <summary>Akun & staf PALSU (data di memori). Ganti dengan implementasi asli Anggota 1 nanti.</summary>
 public sealed class FakeAccountService : IAccountService
 {
-    private const int MinPasswordLength = 6;
+    private const int MinPasswordLength = AccountService.MinPanjangPassword;
     private readonly FakeUserStore _store;
 
     public FakeAccountService(FakeUserStore store) => _store = store;

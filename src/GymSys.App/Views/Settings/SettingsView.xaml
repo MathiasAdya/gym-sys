@@ -21,7 +21,10 @@
             <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                 <StackPanel Width="360" HorizontalAlignment="Left">
                     <TextBlock Text="Ganti Password" Style="{StaticResource SectionTitle}"/>
-                    <TextBlock Text="Minimal 6 karakter." Style="{StaticResource Muted}" FontSize="12" Margin="0,2,0,14"/>
+                    <TextBlock Text="Anda wajib mengganti password sebelum memakai aplikasi." Foreground="{DynamicResource DangerBrush}"
+                               FontWeight="SemiBold" Margin="0,6,0,0" TextWrapping="Wrap"
+                               Visibility="{Binding MustChangePassword, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding PasswordHint}" Style="{StaticResource Muted}" FontSize="12" Margin="0,2,0,14"/>
 
                     <TextBlock Text="Password lama" FontWeight="SemiBold" Margin="0,0,0,6"/>
                     <PasswordBox x:Name="OldBox" Tag="Old" PasswordChanged="OnPasswordChanged"/>

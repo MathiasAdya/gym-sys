@@ -30,6 +30,16 @@ public class AuthServiceTests
     }
 
     [Fact]
+    public async Task Login_WajibGantiPassword_DiteruskanKeUserInfo()
+    {
+        _user.MustChangePassword = true;
+
+        var result = await _auth.LoginAsync("resep", Password);
+
+        Assert.True(result.User!.MustChangePassword);
+    }
+
+    [Fact]
     public async Task Login_UsernameTidakAda_Gagal()
     {
         var result = await _auth.LoginAsync("siapa", Password);

@@ -5,7 +5,8 @@ namespace GymSys.Core.Interfaces;
 // KONTRAK USULAN (PRD Bagian 12.2): dipakai Login (Anggota 2), diimplementasikan AuthService (Anggota 1).
 // Kalau Anggota 1 sudah punya versi sendiri, pakai punya dia dan sesuaikan LoginViewModel.
 
-public sealed record UserInfo(int UserId, string Username, string NamaLengkap, UserRole Role);
+/// <param name="MustChangePassword">Akun baru/seed: Shell hanya membuka Pengaturan sampai password diganti.</param>
+public sealed record UserInfo(int UserId, string Username, string NamaLengkap, UserRole Role, bool MustChangePassword = false);
 
 public sealed record AuthResult(bool Success, string? Message, UserInfo? User)
 {
