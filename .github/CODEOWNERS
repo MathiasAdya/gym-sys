@@ -1,0 +1,11 @@
+# Pemilik file (PRD Bagian 14). Ganti/isi username anggota 2 & 3 setelah mereka join.
+# Anggota 1 - Data & Transaksi
+/src/GymSys.Data/                                   @MathiasAdya
+/src/GymSys.Core/Services/MembershipCalculator*     @MathiasAdya
+/src/GymSys.Core/Services/AuthService*              @MathiasAdya
+/src/GymSys.App/Views/Transactions/                 @MathiasAdya
+/src/GymSys.App/ViewModels/Transactions/            @MathiasAdya
+/src/GymSys.App/App.xaml                            @MathiasAdya
+/src/GymSys.App/App.xaml.cs                         @MathiasAdya
+# Kontrak interface: direview bersama
+/src/GymSys.Core/Interfaces/                        @MathiasAdya

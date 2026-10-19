@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet restore GymSys.sln
+      - run: dotnet build GymSys.sln --no-restore -c Release
+      - run: dotnet test GymSys.sln --no-build -c Release --verbosity normal
