@@ -1,4 +1,4 @@
-# Pemilik file (PRD Bagian 14). Ganti/isi username anggota 2 & 3 setelah mereka join.
+# Pemilik file (PRD Bagian 14)
 # Anggota 1 - Data & Transaksi
 /src/GymSys.Data/                                   @MathiasAdya
 /src/GymSys.Core/Services/MembershipCalculator*     @MathiasAdya
@@ -7,5 +7,27 @@
 /src/GymSys.App/ViewModels/Transactions/            @MathiasAdya
 /src/GymSys.App/App.xaml                            @MathiasAdya
 /src/GymSys.App/App.xaml.cs                         @MathiasAdya
-# Kontrak interface: direview bersama
-/src/GymSys.Core/Interfaces/                        @MathiasAdya
+
+# Anggota 2 - UI Shell & Analitik
+/src/GymSys.App/Themes/                             @prinkaachz
+/src/GymSys.App/Controls/                           @prinkaachz
+/src/GymSys.App/Services/                           @prinkaachz
+/src/GymSys.App/Views/Shell/                        @prinkaachz
+/src/GymSys.App/Views/Login/                        @prinkaachz
+/src/GymSys.App/Views/Dashboard/                    @prinkaachz
+/src/GymSys.App/Views/Reports/                      @prinkaachz
+/src/GymSys.App/Views/Settings/                     @prinkaachz
+
+# Anggota 3 - Master Data & Member
+/src/GymSys.App/Views/Members/                      @faalas
+/src/GymSys.App/Views/Plans/                        @faalas
+/src/GymSys.App/Views/Trainers/                     @faalas
+/src/GymSys.App/ViewModels/Members/                 @faalas
+/src/GymSys.App/ViewModels/Plans/                   @faalas
+/src/GymSys.App/ViewModels/Trainers/                @faalas
+/src/GymSys.Data/Repositories/Member*               @faalas
+/src/GymSys.Data/Repositories/Plan*                 @faalas
+/src/GymSys.Data/Repositories/Trainer*              @faalas
+
+# Kontrak interface: direview bersama ketiga anggota
+/src/GymSys.Core/Interfaces/                        @MathiasAdya @prinkaachz @faalas

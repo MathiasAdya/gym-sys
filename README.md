@@ -84,9 +84,9 @@ gh pr create --base develop      # atau buat PR lewat web GitHub
 
 | Anggota | Peran | Folder milik |
 |---|---|---|
-| 1 | Data & Transaksi | `src/GymSys.Data/*`, `Core/Services/{MembershipCalculator,AuthService}`, `App/{Views,ViewModels}/Transactions`, `App.xaml(.cs)`, migrations |
-| 2 | UI Shell & Analitik | `App/Themes`, `App/Controls`, `App/Services`, `App/Views/{Shell,Login,Dashboard,Reports,Settings}` |
-| 3 | Master Data & Member | `App/Views/{Members,Plans,Trainers}` + ViewModel-nya, repository Member/Plan/Trainer |
+| 1 (@MathiasAdya) | Data & Transaksi | `src/GymSys.Data/*`, `Core/Services/{MembershipCalculator,AuthService}`, `App/{Views,ViewModels}/Transactions`, `App.xaml(.cs)`, migrations |
+| 2 (@prinkaachz) | UI Shell & Analitik | `App/Themes`, `App/Controls`, `App/Services`, `App/Views/{Shell,Login,Dashboard,Reports,Settings}` |
+| 3 (@faalas) | Master Data & Member | `App/Views/{Members,Plans,Trainers}` + ViewModel-nya, repository Member/Plan/Trainer |
 
 - Hanya Anggota 1 yang membuat migration. Kalau butuh kolom baru, buat issue.
 - Interface di `GymSys.Core/Interfaces` hanya berubah lewat PR yang direview dua anggota lain.
