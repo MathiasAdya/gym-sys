@@ -78,8 +78,9 @@ public class MembershipCalculatorTests
     [Theory]
     [InlineData(null, 0)]
     [InlineData("2026-11-09", 0)]
-    [InlineData("2026-11-10", 1)]
-    [InlineData("2026-11-30", 21)]
+    [InlineData("2026-11-10", 0)]
+    [InlineData("2026-11-11", 1)]
+    [InlineData("2026-11-30", 20)]
     public void HitungSisaHari(string? berakhir, int expected) =>
         Assert.Equal(expected, MembershipCalculator.HitungSisaHari(berakhir is null ? null : D(berakhir), HariIni));
 

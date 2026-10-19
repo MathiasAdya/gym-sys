@@ -55,9 +55,12 @@ public static class MembershipCalculator
         return hariIni <= berakhir.AddDays(-HariAkanHabis) ? MemberStatus.Aktif : MemberStatus.AkanHabis;
     }
 
-    /// <summary>Sisa hari masuk, termasuk hari ini (0 kalau sudah lewat atau belum berlangganan).</summary>
+    /// <summary>
+    /// Hari tersisa setelah hari ini, sama dengan DATEDIFF di DashboardQueries: 0 di hari terakhir,
+    /// juga 0 kalau sudah lewat atau belum berlangganan.
+    /// </summary>
     public static int HitungSisaHari(DateOnly? tglBerakhirTerakhir, DateOnly hariIni) =>
-        tglBerakhirTerakhir is { } berakhir ? Math.Max(0, berakhir.DayNumber - hariIni.DayNumber + 1) : 0;
+        tglBerakhirTerakhir is { } berakhir ? Math.Max(0, berakhir.DayNumber - hariIni.DayNumber) : 0;
 
     /// <summary>PRD 7.4: TotalBayar = HargaPaket - Diskon, dengan 0 ≤ Diskon ≤ HargaPaket.</summary>
     public static decimal HitungTotalBayar(decimal hargaPaket, decimal diskon)
