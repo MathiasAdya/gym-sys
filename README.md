@@ -21,6 +21,7 @@ GymSys.sln
 ├─ src/GymSys.Core    Entitas, interface, logika bisnis (MembershipCalculator, dll.)
 ├─ src/GymSys.Data    EF Core DbContext, migrations, repository, query ADO.NET
 ├─ tests/GymSys.Tests xUnit
+├─ db/                Skrip SQL pembuatan database (hasil generate migration)
 ├─ docs/              PRD
 └─ scripts/           check-env.ps1
 ```
@@ -63,7 +64,27 @@ Setiap anggota membuat file sendiri `src/GymSys.App/appsettings.Development.json
 }
 ```
 
-Database dibuat lewat EF Core migrations oleh Anggota 1. Perintahnya akan ditulis di sini begitu migration awal masuk ke `develop`.
+### 4. Buat database `GymSysDb`
+Pastikan service SQL Server jalan (`Start-Service MSSQLSERVER` di PowerShell Admin, atau `MSSQL$SQLEXPRESS` untuk Express). Pilih **salah satu** cara:
+
+**A. Lewat EF Core (disarankan):**
+```powershell
+dotnet tool restore
+dotnet ef database update --project src/GymSys.Data --connection "<connection string kamu>"
+```
+
+**B. Lewat skrip SQL** (tanpa `dotnet ef`): buka `db/GymSysDb.sql` di SSMS lalu Execute, atau:
+```powershell
+sqlcmd -S localhost -E -Q "CREATE DATABASE GymSysDb"
+sqlcmd -S localhost -E -d GymSysDb -i db\GymSysDb.sql
+```
+
+Data awal: akun **`admin` / `Admin#123`** (wajib ganti password saat login pertama) dan paket Bronze/Silver/Gold.
+Kalau `develop` membawa migration baru, ulangi langkah A, atau jalankan ulang skripnya (aman diulang).
+
+### Aturan migration
+- Hanya Anggota 1 yang menambah migration: `dotnet ef migrations add <Nama> --project src/GymSys.Data`, lalu generate ulang skripnya: `dotnet ef migrations script --idempotent --project src/GymSys.Data -o db/GymSysDb.sql`.
+- Butuh kolom/tabel baru? Buat issue, jangan ubah entitas di `GymSys.Core/Entities` sendiri. CI akan gagal kalau entitas berubah tanpa migration.
 
 ## Alur kerja Git (PRD Bagian 14)
 
