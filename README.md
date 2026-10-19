@@ -22,8 +22,10 @@ GymSys.sln
 ├─ src/GymSys.Data    EF Core DbContext, migrations, repository, query ADO.NET
 ├─ tests/GymSys.Tests xUnit
 ├─ db/                Skrip SQL pembuatan database (hasil generate migration)
-├─ docs/              PRD
-└─ scripts/           check-env.ps1
+├─ tools/GymSys.PerfTest  Uji performa NFR-02 (5.000 member + 20.000 transaksi)
+├─ deploy/            Template appsettings.json untuk paket rilis
+├─ docs/              PRD, INSTALL.md (panduan instalasi di komputer gym)
+└─ scripts/           check-env.ps1, publish.ps1
 ```
 
 ## Setup untuk anggota baru (sekitar 15 menit)
@@ -86,6 +88,24 @@ Kalau `develop` membawa migration baru, ulangi langkah A, atau jalankan ulang sk
 ### Aturan migration
 - Hanya Anggota 1 yang menambah migration: `dotnet ef migrations add <Nama> --project src/GymSys.Data`, lalu generate ulang skripnya: `dotnet ef migrations script --idempotent --project src/GymSys.Data -o db/GymSysDb.sql`.
 - Butuh kolom/tabel baru? Buat issue, jangan ubah entitas di `GymSys.Core/Entities` sendiri. CI akan gagal kalau entitas berubah tanpa migration.
+
+## Rilis (NFR-09)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\publish.ps1
+```
+
+Hasilnya ada di `dist\GymSys-win-x64.zip`. Isinya:
+- aplikasi self-contained win-x64, dengan `appsettings.json` dari `deploy/`;
+- `GymSysDb.sql`;
+- `INSTALL.md`.
+
+`appsettings.Development.json` tidak ikut dikemas. Build Release yang tidak menemukan connection string akan berhenti dengan pesan error dan tidak memakai data palsu. Panduan untuk pengguna: [docs/INSTALL.md](docs/INSTALL.md).
+
+Uji performa, wajib memakai database terpisah (bukan `GymSysDb`):
+```powershell
+dotnet run -c Release --project tools/GymSys.PerfTest -- "Server=localhost;Database=GymSysPerf;Trusted_Connection=True;TrustServerCertificate=True"
+```
 
 ## Alur kerja Git (PRD Bagian 14)
 

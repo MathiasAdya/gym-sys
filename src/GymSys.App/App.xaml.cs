@@ -31,8 +31,23 @@ public partial class App : Application
             args.Handled = true;
         };
 
+        var connectionString = ConnectionStringProvider.Get();
+#if !DEBUG
+        // Build rilis tanpa connection string tidak boleh diam-diam memakai data palsu:
+        // transaksi yang "tersimpan" akan hilang saat aplikasi ditutup.
+        if (connectionString is null)
+        {
+            MessageBox.Show("Connection string database belum diatur.\n\nIsi ConnectionStrings:GymSysDb di "
+                + System.IO.Path.Combine(AppContext.BaseDirectory, "appsettings.json")
+                + " (lihat INSTALL.md), lalu buka aplikasi lagi.",
+                "GYM-SYS", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown(1);
+            return;
+        }
+#endif
+
         var services = new ServiceCollection();
-        ConfigureServices(services);
+        ConfigureServices(services, connectionString);
         _services = services.BuildServiceProvider();
 
         _services.GetRequiredService<IThemeService>().LoadSaved();
@@ -44,7 +59,7 @@ public partial class App : Application
         window.Show();
     }
 
-    private static void ConfigureServices(IServiceCollection services)
+    private static void ConfigureServices(IServiceCollection services, string? connectionString)
     {
         // --- Layanan UI (milik Anggota 2) ---
         services.AddSingleton<IThemeService, ThemeService>();
@@ -56,8 +71,7 @@ public partial class App : Application
         services.AddSingleton<ITransactionService, TransactionService>();
 
         // Ada connection string di appsettings(.Development).json -> database ASLI.
-        // Tidak ada -> data PALSU (Fakes) supaya aplikasi tetap bisa didemokan tanpa database.
-        var connectionString = ConnectionStringProvider.Get();
+        // Tidak ada -> data PALSU (Fakes) supaya aplikasi tetap bisa didemokan tanpa database (hanya build Debug).
         if (connectionString is not null)
         {
             // Repository & query (EF Core + ADO.NET) didaftarkan di GymSys.Data.
