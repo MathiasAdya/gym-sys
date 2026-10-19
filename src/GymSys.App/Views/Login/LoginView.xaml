@@ -1,0 +1,57 @@
+<UserControl x:Class="GymSys.App.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FocusManager.FocusedElement="{Binding ElementName=UsernameBox}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.1*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ===== Panel brand (warna tetap, sengaja sama di dua tema) ===== -->
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#1D4ED8" Offset="0"/>
+                    <GradientStop Color="#0F172A" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <StackPanel VerticalAlignment="Center" Margin="64,0">
+                <TextBlock Text="🏋" FontSize="56" Foreground="White"/>
+                <TextBlock Text="GYM-SYS" FontSize="42" FontWeight="Bold" Foreground="White" Margin="0,8,0,0"/>
+                <TextBlock Text="Sistem Manajemen Keanggotaan Gym" FontSize="18" Foreground="#BFDBFE" Margin="0,4,0,28"/>
+                <TextBlock Foreground="#E2E8F0" FontSize="15" TextWrapping="Wrap" LineHeight="26" MaxWidth="420"
+                           Text="Daftarkan member, catat pembayaran paket, dan pantau masa aktif keanggotaan dalam satu aplikasi."/>
+            </StackPanel>
+        </Border>
+
+        <!-- ===== Form login ===== -->
+        <Grid Grid.Column="1" Background="{DynamicResource AppBackgroundBrush}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="340">
+                <TextBlock Text="Selamat datang" Style="{StaticResource PageTitle}"/>
+                <TextBlock Text="Masuk untuk melanjutkan" Style="{StaticResource Muted}" Margin="0,4,0,28"/>
+
+                <TextBlock Text="Username" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <TextBox x:Name="UsernameBox" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Password" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                <PasswordBox x:Name="PasswordBox" PasswordChanged="OnPasswordChanged"/>
+
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource DangerBrush}"
+                           TextWrapping="Wrap" Margin="0,14,0,0"
+                           Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVis}}"/>
+
+                <Button Content="Masuk" Command="{Binding LoginCommand}" IsDefault="True"
+                        Style="{StaticResource PrimaryButton}" Margin="0,22,0,0" Padding="16,11"/>
+
+                <ProgressBar IsIndeterminate="True" Height="3" Margin="0,12,0,0" BorderThickness="0"
+                             Foreground="{DynamicResource AccentBrush}" Background="{DynamicResource LineBrush}"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+
+                <TextBlock Style="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,28,0,0"
+                           Text="Akun demo: admin / admin123, resepsionis / resep123, pt / pt123"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

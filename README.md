@@ -84,9 +84,9 @@ gh pr create --base develop      # atau buat PR lewat web GitHub
 
 | Anggota | Peran | Folder milik |
 |---|---|---|
-| 1 (@MathiasAdya) | Data & Transaksi | `src/GymSys.Data/*`, `Core/Services/{MembershipCalculator,AuthService}`, `App/{Views,ViewModels}/Transactions`, `App.xaml(.cs)`, migrations |
-| 2 (@prinkaachz) | UI Shell & Analitik | `App/Themes`, `App/Controls`, `App/Services`, `App/Views/{Shell,Login,Dashboard,Reports,Settings}` |
-| 3 (@faalas) | Master Data & Member | `App/Views/{Members,Plans,Trainers}` + ViewModel-nya, repository Member/Plan/Trainer |
+| 1 | Data & Transaksi | `src/GymSys.Data/*`, `Core/Services/{MembershipCalculator,AuthService}`, `App/{Views,ViewModels}/Transactions`, `App.xaml(.cs)`, migrations |
+| 2 | UI Shell & Analitik | `App/Themes`, `App/Controls`, `App/Services`, `App/Views/{Shell,Login,Dashboard,Reports,Settings}` |
+| 3 | Master Data & Member | `App/Views/{Members,Plans,Trainers}` + ViewModel-nya, repository Member/Plan/Trainer |
 
 - Hanya Anggota 1 yang membuat migration. Kalau butuh kolom baru, buat issue.
 - Interface di `GymSys.Core/Interfaces` hanya berubah lewat PR yang direview dua anggota lain.
@@ -95,3 +95,6 @@ gh pr create --base develop      # atau buat PR lewat web GitHub
 - Kelas/properti `PascalCase`, field privat `_camelCase`, `XxxViewModel`, `XxxView`.
 - Tidak ada logika bisnis di code-behind. Semuanya lewat binding dan command.
 - Semua method yang mengakses database `async` dan berakhiran `Async`.
+
+## Catatan Anggota 2
+UI shell, tema, login, dashboard, laporan, dan pengaturan sudah masuk (memakai data palsu di `src/GymSys.App/Fakes`). Panduan: [docs/INTEGRASI-ANGGOTA2.md](docs/INTEGRASI-ANGGOTA2.md) dan [docs/README-Anggota2.md](docs/README-Anggota2.md). Akun demo: `admin/admin123`, `resepsionis/resep123`, `pt/pt123`.

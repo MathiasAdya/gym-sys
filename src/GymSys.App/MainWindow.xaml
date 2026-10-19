@@ -1,12 +1,13 @@
-﻿<Window x:Class="GymSys.App.MainWindow"
+<Window x:Class="GymSys.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:GymSys.App"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="GYM-SYS - Sistem Manajemen Keanggotaan Gym"
+        Width="1280" Height="760" MinWidth="1000" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="Segoe UI" FontSize="14">
 
-    </Grid>
+    <!-- Satu-satunya isi jendela: ViewModel aktif (Login atau Shell), dirender lewat DataTemplate di Views/ViewMap.xaml -->
+    <ContentControl Content="{Binding Root}"/>
 </Window>
