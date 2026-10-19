@@ -322,3 +322,37 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261019094251_PerformanceIndexes'
+)
+BEGIN
+    CREATE INDEX [IX_Trx_Tgl] ON [Transactions] ([TglTransaksi]) INCLUDE ([Status], [TotalBayar]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261019094251_PerformanceIndexes'
+)
+BEGIN
+    CREATE INDEX [IX_Members_TglBergabung] ON [Members] ([TglBergabung]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261019094251_PerformanceIndexes'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261019094251_PerformanceIndexes', N'8.0.32');
+END;
+GO
+
+COMMIT;
+GO
+
