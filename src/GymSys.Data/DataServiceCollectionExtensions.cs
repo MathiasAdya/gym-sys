@@ -20,6 +20,7 @@ public static class DataServiceCollectionExtensions
         services.AddSingleton<IDashboardQueries, DashboardQueries>();
         services.AddSingleton<IReportQueries, ReportQueries>();
         services.AddSingleton<IUserRepository, UserRepository>();
+        services.AddSingleton<ITransactionRepository, TransactionRepository>();
         return services;
     }
 }

@@ -71,6 +71,29 @@ public static class MembershipCalculator
         return hargaPaket - diskon;
     }
 
+    /// <summary>PRD 7.4: awalan nomor kuitansi untuk satu hari, "INV-YYYYMMDD-".</summary>
+    public static string AwalanKuitansi(DateOnly tanggal) => $"INV-{tanggal:yyyyMMdd}-";
+
+    /// <summary>
+    /// PRD 7.4: nomor kuitansi berikutnya, urut per hari (INV-YYYYMMDD-NNNN).
+    /// <paramref name="nomorTerakhirHariItu"/> = nomor terbesar yang sudah ada untuk tanggal itu, atau null.
+    /// </summary>
+    public static string NoKuitansiBerikutnya(DateOnly tanggal, string? nomorTerakhirHariItu)
+    {
+        var awalan = AwalanKuitansi(tanggal);
+        var urut = 1;
+        if (nomorTerakhirHariItu is not null)
+        {
+            if (!nomorTerakhirHariItu.StartsWith(awalan, StringComparison.Ordinal)
+                || !int.TryParse(nomorTerakhirHariItu.AsSpan(awalan.Length), out var terakhir))
+                throw new ArgumentException($"Nomor kuitansi tidak valid untuk {tanggal:yyyy-MM-dd}: {nomorTerakhirHariItu}", nameof(nomorTerakhirHariItu));
+            urut = terakhir + 1;
+        }
+        if (urut > 9999)
+            throw new InvalidOperationException($"Nomor kuitansi untuk {tanggal:yyyy-MM-dd} sudah habis (maksimal 9999 per hari).");
+        return $"{awalan}{urut:D4}";
+    }
+
     /// <summary>Teks status sama seperti kolom Status di vw_MemberStatus.</summary>
     public static string ToLabel(this MemberStatus status) => status switch
     {

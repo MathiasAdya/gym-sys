@@ -108,4 +108,21 @@ public class MembershipCalculatorTests
         Assert.Equal(label, status.ToLabel());
         Assert.Equal(status, MembershipCalculator.ParseLabel(label));
     }
+
+    [Theory]
+    [InlineData(null, "INV-20261019-0001")]
+    [InlineData("INV-20261019-0001", "INV-20261019-0002")]
+    [InlineData("INV-20261019-0099", "INV-20261019-0100")]
+    public void NoKuitansiBerikutnya_UrutPerHari(string? terakhir, string expected) =>
+        Assert.Equal(expected, MembershipCalculator.NoKuitansiBerikutnya(new DateOnly(2026, 10, 19), terakhir));
+
+    [Theory]
+    [InlineData("INV-20261018-0005")]
+    [InlineData("INV-20261019-ABCD")]
+    public void NoKuitansiBerikutnya_NomorHariLainAtauRusak_Throw(string terakhir) =>
+        Assert.Throws<ArgumentException>(() => MembershipCalculator.NoKuitansiBerikutnya(new DateOnly(2026, 10, 19), terakhir));
+
+    [Fact]
+    public void NoKuitansiBerikutnya_Lewat9999_Throw() =>
+        Assert.Throws<InvalidOperationException>(() => MembershipCalculator.NoKuitansiBerikutnya(new DateOnly(2026, 10, 19), "INV-20261019-9999"));
 }
