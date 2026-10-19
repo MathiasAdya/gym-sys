@@ -76,8 +76,9 @@ dotnet ef database update --project src/GymSys.Data --connection "<connection st
 **B. Lewat skrip SQL** (tanpa `dotnet ef`): buka `db/GymSysDb.sql` di SSMS lalu Execute, atau:
 ```powershell
 sqlcmd -S localhost -E -Q "CREATE DATABASE GymSysDb"
-sqlcmd -S localhost -E -d GymSysDb -i db\GymSysDb.sql
+sqlcmd -S localhost -E -I -d GymSysDb -i db\GymSysDb.sql
 ```
+Flag `-I` (QUOTED_IDENTIFIER ON) wajib karena ada filtered index. Tanpa itu skrip gagal dengan Msg 1934. SSMS sudah menyalakannya secara default.
 
 Data awal: akun **`admin` / `Admin#123`** (wajib ganti password saat login pertama) dan paket Bronze/Silver/Gold.
 Kalau `develop` membawa migration baru, ulangi langkah A, atau jalankan ulang skripnya (aman diulang).
