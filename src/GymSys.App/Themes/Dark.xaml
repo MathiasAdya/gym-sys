@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Tema GELAP. Nama key HARUS sama persis dengan Light.xaml.
+         Di View/Style selalu pakai {DynamicResource NamaKey}, jangan tulis warna langsung. -->
+
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0F172A"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#1E293B"/>
+    <SolidColorBrush x:Key="SurfaceAltBrush" Color="#273449"/>
+    <SolidColorBrush x:Key="SidebarBrush" Color="#0B1220"/>
+    <SolidColorBrush x:Key="LineBrush" Color="#334155"/>
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E2E8F0"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8"/>
+
+    <SolidColorBrush x:Key="AccentBrush" Color="#3B82F6"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#2563EB"/>
+    <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF"/>
+
+    <SolidColorBrush x:Key="SuccessBrush" Color="#22C55E"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="#EF4444"/>
+    <SolidColorBrush x:Key="InfoBrush" Color="#06B6D4"/>
+
+    <SolidColorBrush x:Key="InputBackgroundBrush" Color="#0F172A"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="#243044"/>
+    <SolidColorBrush x:Key="SelectionBrush" Color="#2B4C8C"/>
+    <SolidColorBrush x:Key="OverlayBrush" Color="#CC0F172A"/>
+
+</ResourceDictionary>

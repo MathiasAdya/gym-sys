@@ -1,0 +1,19 @@
+<UserControl x:Class="GymSys.App.Views.PlaceholderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border Style="{StaticResource Card}" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Padding="48,36" MaxWidth="520">
+        <StackPanel HorizontalAlignment="Center">
+            <TextBlock Text="🚧" FontSize="40" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding Title}" Style="{StaticResource PageTitle}"
+                       HorizontalAlignment="Center" Margin="0,12,0,0"/>
+            <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"
+                       Text="Halaman ini sedang dikerjakan dan akan diganti dengan layar yang sebenarnya."/>
+            <TextBlock Style="{StaticResource Muted}" FontSize="12" HorizontalAlignment="Center" Margin="0,16,0,0">
+                <Run Text="Penanggung jawab: "/>
+                <Run Text="{Binding Owner, Mode=OneWay}" FontWeight="SemiBold"/>
+            </TextBlock>
+        </StackPanel>
+    </Border>
+</UserControl>

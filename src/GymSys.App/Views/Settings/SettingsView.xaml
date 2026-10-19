@@ -1,0 +1,119 @@
+<UserControl x:Class="GymSys.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="940" HorizontalAlignment="Left">
+
+            <!-- ===== Tampilan ===== -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Tampilan" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Pilihan tema tersimpan untuk akun ini." Style="{StaticResource Muted}" FontSize="12" Margin="0,2,0,14"/>
+                    <TextBlock Text="Tema" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <ComboBox Width="220" HorizontalAlignment="Left"
+                              ItemsSource="{Binding ThemeOptions}"
+                              SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ===== Ganti password ===== -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel Width="360" HorizontalAlignment="Left">
+                    <TextBlock Text="Ganti Password" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Minimal 6 karakter." Style="{StaticResource Muted}" FontSize="12" Margin="0,2,0,14"/>
+
+                    <TextBlock Text="Password lama" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <PasswordBox x:Name="OldBox" Tag="Old" PasswordChanged="OnPasswordChanged"/>
+
+                    <TextBlock Text="Password baru" FontWeight="SemiBold" Margin="0,14,0,6"/>
+                    <PasswordBox x:Name="NewBox" Tag="New" PasswordChanged="OnPasswordChanged"/>
+
+                    <TextBlock Text="Ulangi password baru" FontWeight="SemiBold" Margin="0,14,0,6"/>
+                    <PasswordBox x:Name="ConfirmBox" Tag="Confirm" PasswordChanged="OnPasswordChanged"/>
+
+                    <TextBlock Text="{Binding PasswordError}" Foreground="{DynamicResource DangerBrush}"
+                               TextWrapping="Wrap" Margin="0,12,0,0"
+                               Visibility="{Binding PasswordError, Converter={StaticResource StringToVis}}"/>
+                    <TextBlock Text="{Binding PasswordSuccess}" Foreground="{DynamicResource SuccessBrush}"
+                               TextWrapping="Wrap" Margin="0,12,0,0"
+                               Visibility="{Binding PasswordSuccess, Converter={StaticResource StringToVis}}"/>
+
+                    <Button Content="Simpan Password" Command="{Binding ChangePasswordCommand}"
+                            Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Margin="0,16,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ===== Manajemen staf (hanya Admin) ===== -->
+            <Border Style="{StaticResource Card}"
+                    Visibility="{Binding ShowStaffSection, Converter={StaticResource BoolToVis}}">
+                <StackPanel>
+                    <TextBlock Text="Manajemen Staf" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Tambah akun dan atur status aktif staf." Style="{StaticResource Muted}" FontSize="12" Margin="0,2,0,12"/>
+
+                    <DataGrid ItemsSource="{Binding StaffMembers}" MaxHeight="260">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="Auto"/>
+                            <DataGridTextColumn Header="Nama" Binding="{Binding NamaLengkap}" Width="*"/>
+                            <DataGridTextColumn Header="Peran" Binding="{Binding RoleText}" Width="Auto"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="Auto">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Aksi" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="{Binding ToggleText}" Padding="12,5"
+                                                Command="{Binding DataContext.ToggleActiveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <TextBlock Text="Tambah Staf Baru" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                    <WrapPanel>
+                        <StackPanel Width="200" Margin="0,0,12,12">
+                            <TextBlock Text="Username" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                            <TextBox Text="{Binding NewStaffUsername, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Width="220" Margin="0,0,12,12">
+                            <TextBlock Text="Nama lengkap" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                            <TextBox Text="{Binding NewStaffName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Width="160" Margin="0,0,12,12">
+                            <TextBlock Text="Peran" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                            <ComboBox ItemsSource="{Binding RoleOptions}" SelectedItem="{Binding NewStaffRole, Mode=TwoWay}"/>
+                        </StackPanel>
+                        <StackPanel Width="200" Margin="0,0,12,12">
+                            <TextBlock Text="Password awal" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                            <PasswordBox x:Name="StaffPasswordBox" Tag="Staff" PasswordChanged="OnPasswordChanged"/>
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <TextBlock Text="{Binding StaffError}" Foreground="{DynamicResource DangerBrush}"
+                               TextWrapping="Wrap" Margin="0,0,0,8"
+                               Visibility="{Binding StaffError, Converter={StaticResource StringToVis}}"/>
+                    <TextBlock Text="{Binding StaffSuccess}" Foreground="{DynamicResource SuccessBrush}"
+                               TextWrapping="Wrap" Margin="0,0,0,8"
+                               Visibility="{Binding StaffSuccess, Converter={StaticResource StringToVis}}"/>
+
+                    <Button Content="Tambah Staf" Command="{Binding AddStaffCommand}"
+                            Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
+
+            <Border Height="24" Background="Transparent"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,9 +1,19 @@
-﻿<Application x:Class="GymSys.App.App"
+<Application x:Class="GymSys.App.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:GymSys.App"
-             StartupUri="MainWindow.xaml">
+             xmlns:conv="clr-namespace:GymSys.App.Converters">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- JANGAN ubah urutan: ThemeService menukar dictionary di index 0 (tema). -->
+                <ResourceDictionary Source="Themes/Dark.xaml"/>
+                <ResourceDictionary Source="Themes/Styles.xaml"/>
+                <ResourceDictionary Source="Themes/Controls.xaml"/>
+                <ResourceDictionary Source="Views/ViewMap.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            <conv:StringToVisibilityConverter x:Key="StringToVis"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
