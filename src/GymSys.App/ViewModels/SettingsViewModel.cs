@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using GymSys.App.Services;
 using GymSys.Core.Entities;
 using GymSys.Core.Interfaces;
+using GymSys.Core.Services;
 
 namespace GymSys.App.ViewModels;
 
@@ -16,7 +17,7 @@ public sealed record StaffRow(int UserId, string Username, string NamaLengkap, s
 
 public partial class SettingsViewModel : ObservableObject, IAsyncInitializable, IDisposable
 {
-    private const int MinPasswordLength = 6;
+    private const int MinPasswordLength = AccountService.MinPanjangPassword;
     private const string DarkName = "Gelap";
     private const string LightName = "Terang";
 
@@ -38,6 +39,7 @@ public partial class SettingsViewModel : ObservableObject, IAsyncInitializable, 
         var user = currentUser.User ?? throw new InvalidOperationException("Pengaturan dibuka tanpa pengguna yang login.");
         _userId = user.UserId;
         ShowStaffSection = user.Role == UserRole.Admin;
+        MustChangePassword = user.MustChangePassword;
 
         _selectedTheme = ThemeName(_theme.Current);
         _theme.Changed += OnThemeChanged;
@@ -61,6 +63,11 @@ public partial class SettingsViewModel : ObservableObject, IAsyncInitializable, 
     private static string ThemeName(AppTheme theme) => theme == AppTheme.Light ? LightName : DarkName;
 
     // ===== Ganti password =====
+    public string PasswordHint { get; } = $"Minimal {MinPasswordLength} karakter.";
+
+    /// <summary>Akun baru/seed: tampilkan peringatan; Shell membuka menu lain setelah berhasil.</summary>
+    public bool MustChangePassword { get; }
+
     [ObservableProperty] private string _oldPassword = "";
     [ObservableProperty] private string _newPassword = "";
     [ObservableProperty] private string _confirmPassword = "";

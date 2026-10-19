@@ -44,7 +44,7 @@ public sealed class AuthService(IUserRepository users, TimeProvider time) : IAut
             await users.UpdateAsync(user, ct);
         }
 
-        return AuthResult.Ok(new UserInfo(user.UserId, user.Username, user.NamaLengkap, user.Role));
+        return AuthResult.Ok(new UserInfo(user.UserId, user.Username, user.NamaLengkap, user.Role, user.MustChangePassword));
     }
 
     private static string PesanTerkunci(TimeSpan sisa) =>

@@ -27,6 +27,7 @@ public sealed class AccountService(IUserRepository users, ICurrentUserService cu
         user.PasswordHash = PasswordHasher.Hash(newPassword, user.PasswordSalt);
         user.MustChangePassword = false;
         await users.UpdateAsync(user, ct);
+        currentUser.SignIn(currentUser.User with { MustChangePassword = false });
         return OperationResult.Ok("Password berhasil diganti.");
     }
 

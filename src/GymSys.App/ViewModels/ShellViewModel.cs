@@ -68,8 +68,29 @@ public partial class ShellViewModel : ObservableObject
         _theme.Changed += OnThemeChanged;
         UpdateThemeText();
 
-        BuildMenu(user.Role);
+        if (user.MustChangePassword)
+            MenuItems.Add(new("Pengaturan", "⚙", CreateSettingsUntilPasswordChanged));
+        else
+            BuildMenu(user.Role);
         SelectedMenu = MenuItems[0];
+    }
+
+    /// <summary>Akun yang wajib ganti password hanya bisa membuka Pengaturan sampai password diganti.</summary>
+    private object CreateSettingsUntilPasswordChanged()
+    {
+        var settings = _services.GetRequiredService<SettingsViewModel>();
+        settings.PasswordChangeCompleted += () =>
+        {
+            var user = _currentUser.User;
+            if (user is null || user.MustChangePassword)
+                return;
+
+            _dialogs.Info("Password diganti", "Password berhasil diganti. Semua menu sekarang bisa dipakai.");
+            MenuItems.Clear();
+            BuildMenu(user.Role);
+            SelectedMenu = MenuItems[0];
+        };
+        return settings;
     }
 
     /// <summary>

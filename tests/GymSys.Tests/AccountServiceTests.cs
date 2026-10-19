@@ -24,13 +24,14 @@ public class AccountServiceTests
     [Fact]
     public async Task ChangePassword_Berhasil_HashBaruDanMustChangeDihapus()
     {
-        SignIn(_resep);
         _resep.MustChangePassword = true;
+        SignIn(_resep);
 
         var result = await _accounts.ChangePasswordAsync(2, Password, "PasswordBaru1");
 
         Assert.True(result.Success);
         Assert.False(_resep.MustChangePassword);
+        Assert.False(_currentUser.User!.MustChangePassword);
         Assert.True(PasswordHasher.Verify("PasswordBaru1", _resep.PasswordSalt, _resep.PasswordHash));
     }
 
@@ -108,5 +109,5 @@ public class AccountServiceTests
     }
 
     private void SignIn(User user) =>
-        ((ICurrentUserService)_currentUser).SignIn(new UserInfo(user.UserId, user.Username, user.NamaLengkap, user.Role));
+        ((ICurrentUserService)_currentUser).SignIn(new UserInfo(user.UserId, user.Username, user.NamaLengkap, user.Role, user.MustChangePassword));
 }
