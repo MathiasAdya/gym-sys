@@ -13,6 +13,7 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         b.HasIndex(x => x.KodeMember).IsUnique();
         b.HasIndex(x => x.NoTelepon).IsUnique();
         b.HasIndex(x => x.NamaLengkap).HasDatabaseName("IX_Members_Nama");
+        b.HasIndex(x => x.TglBergabung).HasDatabaseName("IX_Members_TglBergabung"); // member baru & tren dashboard
         b.Property(x => x.KodeMember).HasMaxLength(20);
         b.Property(x => x.NamaLengkap).HasMaxLength(100);
         b.Property(x => x.NoTelepon).HasMaxLength(15);

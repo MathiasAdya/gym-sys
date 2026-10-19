@@ -18,6 +18,8 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         b.HasKey(x => x.TransactionId);
         b.HasIndex(x => x.NoKuitansi).IsUnique();
         b.HasIndex(x => new { x.MemberId, x.Status, x.TglBerakhir }).HasDatabaseName("IX_Trx_Member");
+        // Riwayat Transaksi, laporan per periode, dan pendapatan dashboard memfilter rentang TglTransaksi (NFR-02).
+        b.HasIndex(x => x.TglTransaksi).IncludeProperties(x => new { x.Status, x.TotalBayar }).HasDatabaseName("IX_Trx_Tgl");
         b.Property(x => x.NoKuitansi).HasMaxLength(20);
         b.Property(x => x.TglTransaksi).HasDefaultValueSql("SYSDATETIME()");
         b.Property(x => x.Diskon).HasDefaultValue(0m);

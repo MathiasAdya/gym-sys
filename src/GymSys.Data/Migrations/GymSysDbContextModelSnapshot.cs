@@ -91,6 +91,9 @@ namespace GymSys.Data.Migrations
                     b.HasIndex("NoTelepon")
                         .IsUnique();
 
+                    b.HasIndex("TglBergabung")
+                        .HasDatabaseName("IX_Members_TglBergabung");
+
                     b.ToTable("Members", null, t =>
                         {
                             t.HasCheckConstraint("CK_Members_JenisKelamin", "[JenisKelamin] IN ('L','P')");
@@ -312,6 +315,11 @@ namespace GymSys.Data.Migrations
                         .IsUnique();
 
                     b.HasIndex("PlanId");
+
+                    b.HasIndex("TglTransaksi")
+                        .HasDatabaseName("IX_Trx_Tgl");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("TglTransaksi"), new[] { "Status", "TotalBayar" });
 
                     b.HasIndex("UserIdKasir");
 
