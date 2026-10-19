@@ -486,3 +486,6 @@ $RECYCLE.BIN/
 # --- GYM-SYS ---
 # Connection string lokal tiap anggota (NFR-04)
 appsettings.Development.json
+
+# Paket rilis hasil scripts/publish.ps1
+dist/

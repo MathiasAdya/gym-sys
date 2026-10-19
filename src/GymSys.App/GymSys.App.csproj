@@ -13,6 +13,8 @@
   <ItemGroup>
     <!-- appsettings.json / appsettings.Development.json ikut disalin ke folder output (NFR-04). -->
     <None Update="appsettings*.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Connection string lokal developer tidak boleh ikut ke paket rilis (scripts/publish.ps1). -->
+    <None Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
   <PropertyGroup>
