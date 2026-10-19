@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using GymSys.App.Services;
 using GymSys.Core.Entities;
 using GymSys.Core.Interfaces;
+using GymSys.Core.Services;
 
 namespace GymSys.App.ViewModels;
 
@@ -172,9 +173,9 @@ public partial class ReportViewModel : ObservableObject, IAsyncInitializable
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO: tulis detail exception ke file log (NFR-06).
+            AppLog.Error(ex, "ReportViewModel");
             if (version == _loadVersion)
             {
                 ErrorMessage = "Gagal memuat laporan. Periksa koneksi database, lalu coba lagi.";

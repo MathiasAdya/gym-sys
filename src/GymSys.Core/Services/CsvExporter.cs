@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 
-namespace GymSys.App.Services;
+namespace GymSys.Core.Services;
 
 /// <summary>
 /// Penulis CSV untuk ekspor laporan. Pemisah titik koma (;) dan UTF-8 dengan BOM supaya langsung

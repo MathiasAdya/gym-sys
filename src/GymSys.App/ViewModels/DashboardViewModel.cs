@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GymSys.App.Services;
 using GymSys.Core.Entities;
 using GymSys.Core.Interfaces;
 
@@ -82,9 +83,9 @@ public partial class DashboardViewModel : ObservableObject, IAsyncInitializable
                 Expiring.Add(member);
             IsExpiringEmpty = Expiring.Count == 0;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO: tulis detail exception ke file log (NFR-06).
+            AppLog.Error(ex, "DashboardViewModel");
             ErrorMessage = "Gagal memuat data dashboard. Periksa koneksi database, lalu coba lagi.";
         }
         finally

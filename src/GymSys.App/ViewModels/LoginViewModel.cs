@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GymSys.App.Services;
 using GymSys.Core.Interfaces;
 
 namespace GymSys.App.ViewModels;
@@ -52,9 +53,9 @@ public partial class LoginViewModel : ObservableObject
             _currentUser.SignIn(result.User);
             LoginSucceeded?.Invoke();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO: tulis detail exception ke file log (NFR-06); pengguna cukup lihat pesan ramah.
+            AppLog.Error(ex, "LoginViewModel");
             ErrorMessage = "Tidak dapat terhubung ke database. Periksa koneksi lalu coba lagi.";
         }
         finally

@@ -56,11 +56,19 @@ Style tombol: `PrimaryButton`, `GhostButton` (default), `DangerButton`. Kartu: `
 Interface di `GymSys.Core/Interfaces` adalah **usulan kontrak**. Cocokkan dengan Anggota 1 sebelum merge:
 `IAuthService`, `ICurrentUserService`, `IDashboardQueries`, `IReportQueries`, `IAccountService`.
 
-- **Anggota 1** (database asli): di `App.xaml.cs` ganti baris `Fake*` ke implementasi asli. ViewModel tidak perlu diubah.
-  Query asli untuk `IDashboardQueries` dan `IReportQueries` ditulis dengan ADO.NET; aturan total pendapatan = transaksi berstatus "Lunas".
+- **Anggota 1** (database asli): di `App.xaml.cs` ganti baris `Fake*` (auth/akun) ke implementasi asli. ViewModel tidak perlu diubah.
+  Query Dashboard dan Laporan sudah ada di `GymSys.Data/Queries` (ADO.NET, milik Anggota 2) dan aktif otomatis kalau connection string tersedia.
 - **Anggota 1 / 3** (menambah layar): (1) buat View + ViewModel, (2) tambahkan satu `DataTemplate` di
   `Views/ViewMap.xaml`, (3) ganti `PlaceholderViewModel` di `ShellViewModel.BuildMenu` dengan ViewModel asli.
   Kalau layar perlu memuat data saat dibuka, implementasikan `IAsyncInitializable`.
 - Kalau repo bersama sudah punya solution dan `App.xaml.cs` dari Anggota 1, jangan timpa. Salin hanya folder
   `Themes/`, `Controls/`, `Services/`, `Converters/`, `Views/{Shell,Login,Dashboard,Report,Settings,Placeholder}`, `ViewModels/`, `Fakes/`,
   lalu gabungkan isi `App.xaml` (merged dictionaries + 2 converter) dan baris DI di `App.xaml.cs`.
+
+## Memakai database asli untuk Dashboard dan Laporan
+Buat file `src/GymSys.App/appsettings.Development.json` (tidak di-commit):
+```json
+{ "ConnectionStrings": { "GymSysDb": "Server=localhost;Database=GymSysDb;Trusted_Connection=True;TrustServerCertificate=True" } }
+```
+Tanpa file ini, aplikasi memakai data palsu. Error database ditampilkan sebagai pesan ramah + tombol "Coba lagi";
+detailnya ditulis ke `%AppData%\GymSys\logs\yyyy-MM-dd.log`.

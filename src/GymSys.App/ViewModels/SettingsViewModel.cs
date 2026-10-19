@@ -122,9 +122,9 @@ public partial class SettingsViewModel : ObservableObject, IAsyncInitializable, 
             ConfirmPassword = "";
             PasswordChangeCompleted?.Invoke();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO: tulis detail exception ke file log (NFR-06).
+            AppLog.Error(ex, "SettingsViewModel");
             PasswordError = "Tidak dapat menyimpan password. Periksa koneksi database lalu coba lagi.";
         }
         finally
@@ -169,9 +169,9 @@ public partial class SettingsViewModel : ObservableObject, IAsyncInitializable, 
             foreach (var s in staff)
                 StaffMembers.Add(new StaffRow(s.UserId, s.Username, s.NamaLengkap, RoleText(s.Role), s.IsActive));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO: tulis detail exception ke file log (NFR-06).
+            AppLog.Error(ex, "SettingsViewModel");
             StaffError = "Gagal memuat daftar staf. Periksa koneksi database lalu buka ulang halaman ini.";
         }
     }
