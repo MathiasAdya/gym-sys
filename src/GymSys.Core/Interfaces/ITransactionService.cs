@@ -14,4 +14,10 @@ public sealed record TransactionResult(bool Success, string Message, Transaction
 public interface ITransactionService
 {
     Task<TransactionResult> CreateAsync(NewTransactionRequest request, CancellationToken ct = default);
+
+    /// <summary>
+    /// FR-07: hanya Admin, alasan wajib. Status menjadi Batal; masa aktif member otomatis dihitung ulang
+    /// karena status member hanya memakai transaksi Lunas (PRD 7.3).
+    /// </summary>
+    Task<OperationResult> CancelAsync(int transactionId, string alasan, CancellationToken ct = default);
 }

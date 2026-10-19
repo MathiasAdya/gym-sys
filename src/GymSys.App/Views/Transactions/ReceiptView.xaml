@@ -1,0 +1,126 @@
+<UserControl x:Class="GymSys.App.Views.ReceiptView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GymSys.App.Controls"
+             x:Name="Root">
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                    <Button Content="← Kembali" Command="{Binding BackCommand}" Style="{StaticResource GhostButton}" Margin="0,0,8,0"/>
+                    <Button Content="🖨 Cetak" Click="OnPrint" Style="{StaticResource PrimaryButton}"
+                            IsEnabled="{Binding HasReceipt}"/>
+                </StackPanel>
+
+                <!-- Banner error -->
+                <Border Style="{StaticResource Card}" BorderBrush="{DynamicResource DangerBrush}"
+                        Margin="0,0,0,16" Padding="16"
+                        Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVis}}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Coba lagi" Command="{Binding RetryCommand}"/>
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource DangerBrush}"
+                                   VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,16,0"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- Kertas kuitansi: sengaja putih/hitam (tidak ikut tema) supaya tampilan = hasil cetak. -->
+                <Border x:Name="ReceiptPaper" Width="380" Background="White" Padding="24"
+                        BorderBrush="#DDDDDD" BorderThickness="1"
+                        DataContext="{Binding Receipt}"
+                        Visibility="{Binding DataContext.HasReceipt, ElementName=Root, Converter={StaticResource BoolToVis}}">
+                    <Border.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="FontSize" Value="13"/>
+                        </Style>
+                    </Border.Resources>
+                    <StackPanel>
+                        <TextBlock Text="GYM-SYS" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="KUITANSI PEMBAYARAN MEMBERSHIP" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        <TextBlock Text="DIBATALKAN" FontSize="18" FontWeight="Bold" Foreground="#C62828"
+                                   HorizontalAlignment="Center" Margin="0,8,0,0"
+                                   Visibility="{Binding DataContext.IsBatal, ElementName=Root, Converter={StaticResource BoolToVis}}"/>
+                        <Separator Margin="0,12" Background="#999999"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="No. Kuitansi" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding NoKuitansi}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Text="Tanggal" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right"
+                                       Text="{Binding TglTransaksi, StringFormat='dd MMM yyyy HH:mm', ConverterCulture=id-ID}"/>
+                            <TextBlock Grid.Row="2" Text="Member" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" TextAlignment="Right" TextWrapping="Wrap">
+                                <Run Text="{Binding NamaMember, Mode=OneWay}"/><Run Text=" ("/><Run Text="{Binding KodeMember, Mode=OneWay}"/><Run Text=")"/>
+                            </TextBlock>
+                            <TextBlock Grid.Row="3" Text="Paket" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right">
+                                <Run Text="{Binding NamaPaket, Mode=OneWay}"/><Run Text=" ("/><Run Text="{Binding DurasiHari, Mode=OneWay}"/><Run Text=" hari)"/>
+                            </TextBlock>
+                            <TextBlock Grid.Row="4" Text="Masa aktif" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0:dd MMM yyyy} – {1:dd MMM yyyy}" ConverterCulture="id-ID">
+                                        <Binding Path="TglMulaiAktif"/>
+                                        <Binding Path="TglBerakhir"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Row="5" Text="Kasir" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding NamaKasir}" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Separator Margin="0,12" Background="#999999"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Harga paket" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"
+                                       Text="{Binding HargaPaket, StringFormat=C0, ConverterCulture=id-ID}"/>
+                            <TextBlock Grid.Row="1" Text="Diskon" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right"
+                                       Text="{Binding Diskon, StringFormat=- {0:C0}, ConverterCulture=id-ID}"/>
+                            <TextBlock Grid.Row="2" Text="Total bayar" FontWeight="Bold" FontSize="15" Margin="0,4,16,4"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15" Margin="0,4,0,4"
+                                       Text="{Binding TotalBayar, StringFormat=C0, ConverterCulture=id-ID}"/>
+                            <TextBlock Grid.Row="3" Text="Metode bayar" Margin="0,0,16,4"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding MetodeBayar}" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,12,0,0"
+                                   Visibility="{Binding AlasanBatal, Converter={StaticResource StringToVis}}">
+                            <Run Text="Alasan pembatalan: " FontWeight="SemiBold"/><Run Text="{Binding AlasanBatal, Mode=OneWay}"/>
+                        </TextBlock>
+
+                        <Separator Margin="0,12" Background="#999999"/>
+                        <TextBlock Text="Terima kasih. Simpan kuitansi ini sebagai bukti pembayaran." FontSize="11"
+                                   TextWrapping="Wrap" TextAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <controls:LoadingOverlay Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+    </Grid>
+</UserControl>

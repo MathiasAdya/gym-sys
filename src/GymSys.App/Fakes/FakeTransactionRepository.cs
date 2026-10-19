@@ -27,8 +27,11 @@ public sealed class FakeTransactionRepository : ITransactionRepository
 
     private readonly List<Transaction> _transactions = new();
 
-    public FakeTransactionRepository()
+    private readonly FakeUserStore _users;
+
+    public FakeTransactionRepository(FakeUserStore users)
     {
+        _users = users;
         // Andi masih aktif 10 hari lagi, supaya alur perpanjangan bisa dicoba.
         var mulai = DateOnly.FromDateTime(DateTime.Today).AddDays(-19);
         _transactions.Add(new Transaction
@@ -94,6 +97,56 @@ public sealed class FakeTransactionRepository : ITransactionRepository
             transaction.NoKuitansi = MembershipCalculator.NoKuitansiBerikutnya(tanggal, terakhir);
             transaction.TransactionId = _transactions.Max(t => t.TransactionId) + 1;
             _transactions.Add(transaction);
+            return Task.FromResult(true);
+        }
+    }
+
+    public Task<PagedResult<TransactionHistoryRowDto>> GetHistoryAsync(TransactionHistoryQuery query, CancellationToken ct = default)
+    {
+        lock (_lock)
+        {
+            var rows = _transactions
+                .Where(t => DateOnly.FromDateTime(t.TglTransaksi) >= query.From && DateOnly.FromDateTime(t.TglTransaksi) <= query.To)
+                .Where(t => query.Status is null || t.Status == query.Status)
+                .OrderByDescending(t => t.TglTransaksi).ThenByDescending(t => t.TransactionId)
+                .ToList();
+            var items = rows
+                .Skip((Math.Max(1, query.Page) - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(t =>
+                {
+                    var m = _members.Single(x => x.MemberId == t.MemberId);
+                    return new TransactionHistoryRowDto(t.TransactionId, t.NoKuitansi, t.TglTransaksi, m.KodeMember, m.NamaLengkap,
+                        _plans.Single(p => p.PlanId == t.PlanId).NamaPaket, t.TglMulaiAktif, t.TglBerakhir, t.TotalBayar,
+                        t.MetodeBayar, t.Status, t.AlasanBatal);
+                })
+                .ToList();
+            return Task.FromResult(new PagedResult<TransactionHistoryRowDto>(items, rows.Count));
+        }
+    }
+
+    public Task<ReceiptDto?> GetReceiptAsync(int transactionId, CancellationToken ct = default)
+    {
+        lock (_lock)
+        {
+            var t = _transactions.SingleOrDefault(x => x.TransactionId == transactionId);
+            if (t is null) return Task.FromResult<ReceiptDto?>(null);
+            var m = _members.Single(x => x.MemberId == t.MemberId);
+            var p = _plans.Single(x => x.PlanId == t.PlanId);
+            return Task.FromResult<ReceiptDto?>(new ReceiptDto(t.TransactionId, t.NoKuitansi, t.TglTransaksi, m.KodeMember,
+                m.NamaLengkap, p.NamaPaket, p.DurasiHari, t.TglMulaiAktif, t.TglBerakhir, t.HargaPaket, t.Diskon, t.TotalBayar,
+                t.MetodeBayar, _users.FindById(t.UserIdKasir)?.NamaLengkap ?? "-", t.Status, t.AlasanBatal));
+        }
+    }
+
+    public Task<bool> TryCancelAsync(int transactionId, string alasan, CancellationToken ct = default)
+    {
+        lock (_lock)
+        {
+            var t = _transactions.SingleOrDefault(x => x.TransactionId == transactionId && x.Status == StatusTransaksi.Lunas);
+            if (t is null) return Task.FromResult(false);
+            t.Status = StatusTransaksi.Batal;
+            t.AlasanBatal = alasan;
             return Task.FromResult(true);
         }
     }

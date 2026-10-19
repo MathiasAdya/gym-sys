@@ -1,0 +1,181 @@
+<UserControl x:Class="GymSys.App.Views.TransactionHistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GymSys.App.Controls"
+             xmlns:vm="clr-namespace:GymSys.App.ViewModels"
+             xmlns:core="clr-namespace:GymSys.Core.Services;assembly=GymSys.Core">
+
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Banner error -->
+            <Border Grid.Row="0" Style="{StaticResource Card}" BorderBrush="{DynamicResource DangerBrush}"
+                    Margin="0,0,0,16" Padding="16"
+                    Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVis}}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Coba lagi" Command="{Binding ApplyFilterCommand}"/>
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource DangerBrush}"
+                               VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,16,0"/>
+                </DockPanel>
+            </Border>
+
+            <!-- Filter -->
+            <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,16" Padding="20,16">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Width="170" Margin="0,0,16,0">
+                        <TextBlock Text="Dari tanggal" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                        <DatePicker SelectedDate="{Binding DateFrom, Mode=TwoWay}"
+                                    Background="{DynamicResource InputBackgroundBrush}"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    BorderBrush="{DynamicResource LineBrush}" Padding="6"/>
+                    </StackPanel>
+                    <StackPanel Width="170" Margin="0,0,16,0">
+                        <TextBlock Text="Sampai tanggal" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                        <DatePicker SelectedDate="{Binding DateTo, Mode=TwoWay}"
+                                    Background="{DynamicResource InputBackgroundBrush}"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    BorderBrush="{DynamicResource LineBrush}" Padding="6"/>
+                    </StackPanel>
+                    <StackPanel Width="170" Margin="0,0,16,0">
+                        <TextBlock Text="Status" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                        <ComboBox ItemsSource="{Binding StatusOptions}" DisplayMemberPath="Title"
+                                  SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <Button Content="Tampilkan" Command="{Binding ApplyFilterCommand}"
+                            Style="{StaticResource PrimaryButton}" VerticalAlignment="Bottom"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Panel pembatalan (Admin, FR-07) -->
+            <Border Grid.Row="2" Style="{StaticResource Card}" BorderBrush="{DynamicResource WarningBrush}"
+                    Margin="0,0,0,16" Padding="20,16"
+                    Visibility="{Binding IsCancelOpen, Converter={StaticResource BoolToVis}}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionTitle}">
+                        <Run Text="Batalkan transaksi"/>
+                        <Run Text="{Binding CancelTarget.NoKuitansi, Mode=OneWay}"/>
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,4,0,10">
+                        <Run Text="{Binding CancelTarget.NamaMember, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding CancelTarget.NamaPaket, Mode=OneWay}"/><Run Text=". Data tidak dihapus; status menjadi Batal dan masa aktif member dihitung ulang."/>
+                    </TextBlock>
+                    <TextBlock Text="Alasan pembatalan (wajib)" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding CancelReason, UpdateSourceTrigger=PropertyChanged}"
+                             MaxLength="{x:Static core:TransactionService.MaksPanjangAlasan}"/>
+                    <TextBlock Text="{Binding CancelError}" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" Margin="0,4,0,0"
+                               Visibility="{Binding CancelError, Converter={StaticResource StringToVis}}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                        <Button Content="Tidak jadi" Command="{Binding AbortCancelCommand}"
+                                Style="{StaticResource GhostButton}" Margin="0,0,8,0"/>
+                        <Button Content="Batalkan Transaksi" Command="{Binding ConfirmCancelCommand}"
+                                Style="{StaticResource DangerButton}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Hasil -->
+            <Border Grid.Row="3" Style="{StaticResource Card}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid x:Name="HistoryGrid" ItemsSource="{Binding Rows}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="No. Kuitansi" Binding="{Binding NoKuitansi}" Width="Auto"/>
+                            <DataGridTextColumn Header="Tanggal" Width="Auto"
+                                                Binding="{Binding TglTransaksi, StringFormat='dd MMM yyyy HH:mm', ConverterCulture=id-ID}"/>
+                            <DataGridTextColumn Header="Member" Width="*">
+                                <DataGridTextColumn.Binding>
+                                    <MultiBinding StringFormat="{}{0} · {1}">
+                                        <Binding Path="KodeMember"/>
+                                        <Binding Path="NamaMember"/>
+                                    </MultiBinding>
+                                </DataGridTextColumn.Binding>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Paket" Binding="{Binding NamaPaket}" Width="Auto"/>
+                            <DataGridTextColumn Header="Masa aktif" Width="Auto">
+                                <DataGridTextColumn.Binding>
+                                    <MultiBinding StringFormat="{}{0:dd MMM yyyy} – {1:dd MMM yyyy}" ConverterCulture="id-ID">
+                                        <Binding Path="TglMulaiAktif"/>
+                                        <Binding Path="TglBerakhir"/>
+                                    </MultiBinding>
+                                </DataGridTextColumn.Binding>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Total" Width="Auto"
+                                                Binding="{Binding TotalBayar, StringFormat=C0, ConverterCulture=id-ID}"/>
+                            <DataGridTextColumn Header="Metode" Binding="{Binding MetodeBayar}" Width="Auto"/>
+                            <DataGridTemplateColumn Header="Status" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Status}" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                   ToolTip="{Binding AlasanBatal}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsLunas}" Value="False">
+                                                            <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Aksi" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Kuitansi" Style="{StaticResource GhostButton}" Padding="10,4"
+                                                    Command="{Binding DataContext.ViewReceiptCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                            <!-- Batalkan hanya untuk Admin dan transaksi yang masih Lunas -->
+                                            <Button Content="Batalkan" Padding="10,4" Margin="6,0,0,0"
+                                                    Command="{Binding DataContext.BeginCancelCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DangerButton}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding IsLunas}" Value="True"/>
+                                                                    <Condition Binding="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True"/>
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </MultiDataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <TextBlock Text="Tidak ada transaksi untuk filter yang dipilih."
+                               Style="{StaticResource Muted}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"/>
+
+                    <controls:PagingBar Grid.Row="1" Margin="0,12,0,0"
+                                        PageIndex="{Binding PageIndex, Mode=TwoWay}"
+                                        PageSize="{x:Static vm:TransactionHistoryViewModel.PageSize}"
+                                        TotalItems="{Binding TotalItems}"
+                                        Command="{Binding GoToPageCommand}"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <controls:LoadingOverlay Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+    </Grid>
+</UserControl>

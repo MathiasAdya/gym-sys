@@ -15,7 +15,7 @@ namespace GymSys.App.ViewModels;
 /// FR-06 Transaksi Baru: pilih member dan paket, pratinjau tanggal, diskon, metode bayar.
 /// Pratinjau memakai MembershipCalculator yang sama dengan TransactionService, jadi angka di layar = yang disimpan.
 /// </summary>
-public partial class NewTransactionViewModel : ObservableValidator, IAsyncInitializable, IDisposable
+public partial class NewTransactionViewModel : ObservableValidator, IAsyncInitializable
 {
     private const int MaksHasilCari = 20;
     private static readonly CultureInfo Id = CultureInfo.GetCultureInfo("id-ID");
@@ -23,6 +23,7 @@ public partial class NewTransactionViewModel : ObservableValidator, IAsyncInitia
     private readonly ITransactionRepository _repository;
     private readonly ITransactionService _service;
     private readonly IDialogService _dialogs;
+    private readonly INavigationService _navigation;
     private readonly TimeProvider _time;
     private readonly bool _isAdmin;
 
@@ -36,11 +37,13 @@ public partial class NewTransactionViewModel : ObservableValidator, IAsyncInitia
         ITransactionService service,
         ICurrentUserService currentUser,
         IDialogService dialogs,
+        INavigationService navigation,
         TimeProvider time)
     {
         _repository = repository;
         _service = service;
         _dialogs = dialogs;
+        _navigation = navigation;
         _time = time;
         _isAdmin = currentUser.IsInRole(UserRole.Admin);
         ErrorsChanged += OnErrorsChanged;
@@ -280,8 +283,9 @@ public partial class NewTransactionViewModel : ObservableValidator, IAsyncInitia
                 return;
             }
 
-            _dialogs.Info("Transaksi tersimpan", result.Message);
+            // Form dikosongkan dulu, jadi "Kembali" dari kuitansi langsung siap untuk transaksi berikutnya.
             ResetForm();
+            _navigation.NavigateTo(new ReceiptViewModel(_repository, result.Transaction!.TransactionId, () => _navigation.NavigateTo(this)));
         }
         catch (Exception ex)
         {
@@ -302,6 +306,4 @@ public partial class NewTransactionViewModel : ObservableValidator, IAsyncInitia
         MetodeBayar = MetodeBayar.Tunai;
         ClearErrors();
     }
-
-    public void Dispose() => ErrorsChanged -= OnErrorsChanged;
 }

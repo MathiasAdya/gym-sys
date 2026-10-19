@@ -124,6 +124,70 @@ public class TransactionServiceTests
         Assert.Single(_repo.Transactions);
     }
 
+    [Fact]
+    public async Task Cancel_Admin_StatusBatalAlasanDisimpanMasaAktifDihitungUlang()
+    {
+        var aktif = Lunas(berakhir: new DateOnly(2026, 10, 25));
+        _repo.Transactions.Add(aktif);
+        SignIn(UserRole.Admin);
+
+        var result = await _service.CancelAsync(aktif.TransactionId, "  Salah pilih paket  ");
+
+        Assert.True(result.Success, result.Message);
+        Assert.Equal(StatusTransaksi.Batal, aktif.Status);
+        Assert.Equal("Salah pilih paket", aktif.AlasanBatal);
+        Assert.Single(_repo.Transactions);
+        // Tanpa transaksi yang dibatalkan, member kembali bisa mulai hari ini.
+        Assert.True((await _service.CreateAsync(new(1, 1, HariIni, 0, MetodeBayar.Tunai))).Success);
+    }
+
+    [Fact]
+    public async Task Cancel_Resepsionis_Ditolak()
+    {
+        var aktif = Lunas(berakhir: new DateOnly(2026, 10, 25));
+        _repo.Transactions.Add(aktif);
+
+        var result = await _service.CancelAsync(aktif.TransactionId, "alasan");
+
+        Assert.False(result.Success);
+        Assert.Equal(StatusTransaksi.Lunas, aktif.Status);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task Cancel_AlasanKosong_Ditolak(string alasan)
+    {
+        var aktif = Lunas(berakhir: new DateOnly(2026, 10, 25));
+        _repo.Transactions.Add(aktif);
+        SignIn(UserRole.Admin);
+
+        Assert.False((await _service.CancelAsync(aktif.TransactionId, alasan)).Success);
+        Assert.Equal(StatusTransaksi.Lunas, aktif.Status);
+    }
+
+    [Fact]
+    public async Task Cancel_AlasanTerlaluPanjang_Ditolak()
+    {
+        var aktif = Lunas(berakhir: new DateOnly(2026, 10, 25));
+        _repo.Transactions.Add(aktif);
+        SignIn(UserRole.Admin);
+
+        var result = await _service.CancelAsync(aktif.TransactionId, new string('x', TransactionService.MaksPanjangAlasan + 1));
+
+        Assert.False(result.Success);
+    }
+
+    [Fact]
+    public async Task Cancel_SudahBatal_Ditolak()
+    {
+        var batal = Lunas(berakhir: new DateOnly(2026, 10, 25), StatusTransaksi.Batal);
+        _repo.Transactions.Add(batal);
+        SignIn(UserRole.Admin);
+
+        Assert.False((await _service.CancelAsync(batal.TransactionId, "lagi")).Success);
+    }
+
     private Transaction Lunas(DateOnly berakhir, StatusTransaksi status = StatusTransaksi.Lunas) => new()
     {
         TransactionId = 100 + _repo.Transactions.Count,
