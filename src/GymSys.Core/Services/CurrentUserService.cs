@@ -1,9 +1,9 @@
 using GymSys.Core.Entities;
 using GymSys.Core.Interfaces;
 
-namespace GymSys.App.Fakes;
+namespace GymSys.Core.Services;
 
-/// <summary>Implementasi sederhana (hanya menyimpan state di memori). Boleh dipakai terus atau diganti milik Anggota 1.</summary>
+/// <summary>Pengguna yang sedang login, disimpan di memori selama aplikasi berjalan.</summary>
 public sealed class CurrentUserService : ICurrentUserService
 {
     public UserInfo? User { get; private set; }

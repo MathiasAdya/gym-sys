@@ -3,7 +3,9 @@ using GymSys.App.Fakes;
 using GymSys.App.Services;
 using GymSys.App.ViewModels;
 using GymSys.Core.Interfaces;
-using GymSys.Data.Queries;
+using GymSys.Core.Services;
+using GymSys.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GymSys.App;
@@ -20,8 +22,11 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             AppLog.Error(args.Exception, "DispatcherUnhandledException");
-            MessageBox.Show(
-                "Terjadi kesalahan tak terduga. Silakan ulangi aksi terakhir Anda.\n\n" + args.Exception.Message,
+            // Pesan teknis hanya ke log; pengguna melihat pesan ramah.
+            var pesan = args.Exception is SqlException
+                ? "Tidak dapat terhubung ke database. Periksa koneksi lalu coba lagi."
+                : "Terjadi kesalahan tak terduga. Silakan ulangi aksi terakhir Anda.";
+            MessageBox.Show(pesan + "\n\nDetail tersimpan di " + AppLog.LogFolder,
                 "GYM-SYS", MessageBoxButton.OK, MessageBoxImage.Warning);
             args.Handled = true;
         };
@@ -46,28 +51,27 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IDialogService, DialogService>();
 
-        // --- Query dashboard & laporan (milik Anggota 2, ADO.NET) ---
+        services.AddSingleton<ICurrentUserService, CurrentUserService>();
+
         // Ada connection string di appsettings(.Development).json -> database ASLI.
         // Tidak ada -> data PALSU (Fakes) supaya aplikasi tetap bisa didemokan tanpa database.
         var connectionString = ConnectionStringProvider.Get();
         if (connectionString is not null)
         {
-            services.AddSingleton(new SqlConnectionFactory(connectionString));
-            services.AddSingleton<IDashboardQueries, DashboardQueries>();
-            services.AddSingleton<IReportQueries, ReportQueries>();
+            // Repository & query (EF Core + ADO.NET) didaftarkan di GymSys.Data.
+            services.AddGymSysData(connectionString);
+            services.AddSingleton(TimeProvider.System);
+            services.AddSingleton<IAuthService, AuthService>();
+            services.AddSingleton<IAccountService, AccountService>();
         }
         else
         {
             services.AddSingleton<IDashboardQueries, FakeDashboardQueries>();
             services.AddSingleton<IReportQueries, FakeReportQueries>();
+            services.AddSingleton<FakeUserStore>();
+            services.AddSingleton<IAuthService, FakeAuthService>();
+            services.AddSingleton<IAccountService, FakeAccountService>();
         }
-
-        // --- Sementara memakai FAKE. Kalau implementasi asli Anggota 1 sudah ada di GymSys.Data/Core,
-        //     cukup tukar baris Fake* di bawah ini (ViewModel tidak perlu diubah). ---
-        services.AddSingleton<FakeUserStore>();
-        services.AddSingleton<ICurrentUserService, CurrentUserService>();
-        services.AddSingleton<IAuthService, FakeAuthService>();
-        services.AddSingleton<IAccountService, FakeAccountService>();
 
         // --- ViewModel ---
         services.AddSingleton<MainWindowViewModel>();
