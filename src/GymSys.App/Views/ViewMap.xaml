@@ -32,4 +32,8 @@
 
     <!-- === Tambahan Anggota 1 / Anggota 3 di bawah ini === -->
 
+    <DataTemplate DataType="{x:Type vm:NewTransactionViewModel}">
+        <views:NewTransactionView/>
+    </DataTemplate>
+
 </ResourceDictionary>

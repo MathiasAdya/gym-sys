@@ -52,6 +52,8 @@ public partial class App : Application
         services.AddSingleton<IDialogService, DialogService>();
 
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<ITransactionService, TransactionService>();
 
         // Ada connection string di appsettings(.Development).json -> database ASLI.
         // Tidak ada -> data PALSU (Fakes) supaya aplikasi tetap bisa didemokan tanpa database.
@@ -60,7 +62,6 @@ public partial class App : Application
         {
             // Repository & query (EF Core + ADO.NET) didaftarkan di GymSys.Data.
             services.AddGymSysData(connectionString);
-            services.AddSingleton(TimeProvider.System);
             services.AddSingleton<IAuthService, AuthService>();
             services.AddSingleton<IAccountService, AccountService>();
         }
@@ -71,6 +72,7 @@ public partial class App : Application
             services.AddSingleton<FakeUserStore>();
             services.AddSingleton<IAuthService, FakeAuthService>();
             services.AddSingleton<IAccountService, FakeAccountService>();
+            services.AddSingleton<ITransactionRepository, FakeTransactionRepository>();
         }
 
         // --- ViewModel ---
@@ -80,5 +82,6 @@ public partial class App : Application
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<ReportViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<NewTransactionViewModel>();
     }
 }

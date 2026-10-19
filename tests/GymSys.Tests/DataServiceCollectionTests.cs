@@ -21,5 +21,6 @@ public class DataServiceCollectionTests
         Assert.NotNull(provider.GetRequiredService<IDashboardQueries>());
         Assert.NotNull(provider.GetRequiredService<IReportQueries>());
         Assert.NotNull(provider.GetRequiredService<IUserRepository>());
+        Assert.NotNull(provider.GetRequiredService<ITransactionRepository>());
     }
 }
