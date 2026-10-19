@@ -50,4 +50,20 @@ internal sealed class FakeTransactionRepository : ITransactionRepository
         Transactions.Add(transaction);
         return true;
     }
+
+    // Query layar (riwayat, kuitansi) tidak dipakai TransactionService.
+    public Task<PagedResult<TransactionHistoryRowDto>> GetHistoryAsync(TransactionHistoryQuery query, CancellationToken ct = default) =>
+        throw new NotSupportedException();
+
+    public Task<ReceiptDto?> GetReceiptAsync(int transactionId, CancellationToken ct = default) =>
+        throw new NotSupportedException();
+
+    public Task<bool> TryCancelAsync(int transactionId, string alasan, CancellationToken ct = default)
+    {
+        var t = Transactions.SingleOrDefault(x => x.TransactionId == transactionId && x.Status == StatusTransaksi.Lunas);
+        if (t is null) return Task.FromResult(false);
+        t.Status = StatusTransaksi.Batal;
+        t.AlasanBatal = alasan;
+        return Task.FromResult(true);
+    }
 }

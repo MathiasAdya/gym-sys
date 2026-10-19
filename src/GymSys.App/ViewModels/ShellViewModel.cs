@@ -104,7 +104,10 @@ public partial class ShellViewModel : ObservableObject
         MenuItems.Add(new("Member", "👥", () => new PlaceholderViewModel("Member", "Anggota 3")));
 
         if (role != UserRole.Instruktur)
+        {
             MenuItems.Add(new("Transaksi", "💳", () => _services.GetRequiredService<NewTransactionViewModel>()));
+            MenuItems.Add(new("Riwayat Transaksi", "🧾", () => _services.GetRequiredService<TransactionHistoryViewModel>()));
+        }
 
         MenuItems.Add(new("Paket", "🏷", () => new PlaceholderViewModel("Paket", "Anggota 3")));
         MenuItems.Add(new("Instruktur", "🏋", () => new PlaceholderViewModel("Instruktur", "Anggota 3")));

@@ -75,4 +75,50 @@ public sealed class TransactionRepository(IDbContextFactory<GymSysDbContext> fac
         await tx.CommitAsync(ct);
         return true;
     }
+
+    public async Task<PagedResult<TransactionHistoryRowDto>> GetHistoryAsync(TransactionHistoryQuery query, CancellationToken ct = default)
+    {
+        var dari = query.From.ToDateTime(TimeOnly.MinValue);
+        var sampai = query.To.AddDays(1).ToDateTime(TimeOnly.MinValue);
+
+        await using var db = await factory.CreateDbContextAsync(ct);
+        var q = db.Transactions.AsNoTracking().Where(t => t.TglTransaksi >= dari && t.TglTransaksi < sampai);
+        if (query.Status is { } status)
+            q = q.Where(t => t.Status == status);
+
+        var total = await q.CountAsync(ct);
+        var items = await q
+            .OrderByDescending(t => t.TglTransaksi).ThenByDescending(t => t.TransactionId)
+            .Skip((Math.Max(1, query.Page) - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .Select(t => new TransactionHistoryRowDto(
+                t.TransactionId, t.NoKuitansi, t.TglTransaksi, t.Member!.KodeMember, t.Member.NamaLengkap, t.Plan!.NamaPaket,
+                t.TglMulaiAktif, t.TglBerakhir, t.TotalBayar, t.MetodeBayar, t.Status, t.AlasanBatal))
+            .ToListAsync(ct);
+        return new PagedResult<TransactionHistoryRowDto>(items, total);
+    }
+
+    public async Task<ReceiptDto?> GetReceiptAsync(int transactionId, CancellationToken ct = default)
+    {
+        await using var db = await factory.CreateDbContextAsync(ct);
+        return await db.Transactions.AsNoTracking()
+            .Where(t => t.TransactionId == transactionId)
+            .Select(t => new ReceiptDto(
+                t.TransactionId, t.NoKuitansi, t.TglTransaksi, t.Member!.KodeMember, t.Member.NamaLengkap,
+                t.Plan!.NamaPaket, t.Plan.DurasiHari, t.TglMulaiAktif, t.TglBerakhir, t.HargaPaket, t.Diskon, t.TotalBayar,
+                t.MetodeBayar, t.Kasir!.NamaLengkap, t.Status, t.AlasanBatal))
+            .SingleOrDefaultAsync(ct);
+    }
+
+    public async Task<bool> TryCancelAsync(int transactionId, string alasan, CancellationToken ct = default)
+    {
+        await using var db = await factory.CreateDbContextAsync(ct);
+        // Satu UPDATE bersyarat: dua Admin yang membatalkan bersamaan tidak saling menimpa alasan.
+        var changed = await db.Transactions
+            .Where(t => t.TransactionId == transactionId && t.Status == StatusTransaksi.Lunas)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(t => t.Status, StatusTransaksi.Batal)
+                .SetProperty(t => t.AlasanBatal, alasan), ct);
+        return changed == 1;
+    }
 }

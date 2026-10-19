@@ -36,4 +36,12 @@
         <views:NewTransactionView/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:TransactionHistoryViewModel}">
+        <views:TransactionHistoryView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ReceiptViewModel}">
+        <views:ReceiptView/>
+    </DataTemplate>
+
 </ResourceDictionary>

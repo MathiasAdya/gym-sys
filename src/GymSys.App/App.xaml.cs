@@ -83,5 +83,6 @@ public partial class App : Application
         services.AddTransient<ReportViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<NewTransactionViewModel>();
+        services.AddTransient<TransactionHistoryViewModel>();
     }
 }
