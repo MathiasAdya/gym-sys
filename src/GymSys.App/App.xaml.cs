@@ -89,6 +89,17 @@ public partial class App : Application
             services.AddSingleton<ITransactionRepository, FakeTransactionRepository>();
         }
 
+        // --- Anggota 3: Member, Paket, Instruktur ---
+        // SEMENTARA selalu memakai data palsu sampai repository EF Core asli selesai;
+        // setelah itu ketiga repository pindah ke AddGymSysData dan baris Fake ini masuk ke blok else di atas.
+        services.AddSingleton<FakeMasterDataStore>();
+        services.AddSingleton<IMemberRepository, FakeMemberRepository>();
+        services.AddSingleton<IPlanRepository, FakePlanRepository>();
+        services.AddSingleton<ITrainerRepository, FakeTrainerRepository>();
+        services.AddSingleton<IMemberService, MemberService>();
+        services.AddSingleton<IPlanService, PlanService>();
+        services.AddSingleton<ITrainerService, TrainerService>();
+
         // --- ViewModel ---
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<LoginViewModel>();
