@@ -60,4 +60,8 @@
         <views:MemberDetailView/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:TrainersViewModel}">
+        <views:TrainersView/>
+    </DataTemplate>
+
 </ResourceDictionary>

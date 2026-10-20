@@ -115,6 +115,25 @@
 
                                 <TextBlock Text="Instruktur (PT)" Style="{StaticResource SectionTitle}" Margin="0,24,0,8"/>
                                 <TextBlock Text="{Binding Instruktur}" TextWrapping="Wrap"/>
+
+                                <!-- Penugasan PT (Admin, Resepsionis) -->
+                                <StackPanel Margin="0,12,0,0"
+                                            Visibility="{Binding CanAssign, Converter={StaticResource BoolToVis}}">
+                                    <ComboBox ItemsSource="{Binding TrainerOptions}"
+                                              SelectedItem="{Binding SelectedTrainerOption, Mode=TwoWay}"/>
+                                    <TextBlock Text="{Binding AssignError}" Foreground="{DynamicResource DangerBrush}"
+                                               TextWrapping="Wrap" Margin="0,4,0,0"
+                                               Visibility="{Binding AssignError, Converter={StaticResource StringToVis}}"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                        <Button Content="Tugaskan" Command="{Binding AssignCommand}"
+                                                Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"/>
+                                        <Button Content="Akhiri Penugasan" Command="{Binding EndAssignmentCommand}"
+                                                Style="{StaticResource GhostButton}"
+                                                Visibility="{Binding CanEndAssignment, Converter={StaticResource BoolToVis}}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="Satu member hanya punya satu instruktur aktif. Menugaskan instruktur baru otomatis mengakhiri yang lama."
+                                               Style="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                     </Grid>

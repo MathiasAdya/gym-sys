@@ -110,7 +110,7 @@ public partial class ShellViewModel : ObservableObject
         }
 
         MenuItems.Add(new("Paket", "🏷", () => _services.GetRequiredService<PlansViewModel>()));
-        MenuItems.Add(new("Instruktur", "🏋", () => new PlaceholderViewModel("Instruktur", "Anggota 3")));
+        MenuItems.Add(new("Instruktur", "🏋", () => _services.GetRequiredService<TrainersViewModel>()));
 
         if (role != UserRole.Instruktur)
             MenuItems.Add(new("Laporan", "📊", () => _services.GetRequiredService<ReportViewModel>()));

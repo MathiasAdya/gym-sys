@@ -10,9 +10,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GymSys.App.ViewModels;
 
+/// <summary>Pilihan instruktur di Detail Member.</summary>
+public sealed record TrainerOption(int TrainerId, string Nama, string? Keahlian)
+{
+    // Kotak ComboBox bertema menampilkan ToString(), bukan DisplayMemberPath.
+    public override string ToString() => Keahlian is null ? Nama : $"{Nama} · {Keahlian}";
+}
+
 /// <summary>
-/// Detail Member (PRD Bagian 9): profil, status + sisa hari (PRD 7.3), instruktur, riwayat transaksi,
-/// dan tombol Perpanjang yang membuka layar Transaksi Baru milik Anggota 1.
+/// Detail Member (PRD Bagian 9): profil, status + sisa hari (PRD 7.3), instruktur dan penugasan PT (FR-10),
+/// riwayat transaksi, serta tombol Perpanjang yang membuka layar Transaksi Baru milik Anggota 1.
 /// </summary>
 public partial class MemberDetailViewModel : ObservableObject, IAsyncInitializable
 {
@@ -21,6 +28,7 @@ public partial class MemberDetailViewModel : ObservableObject, IAsyncInitializab
     private readonly IMemberRepository _members;
     private readonly ITrainerRepository _trainers;
     private readonly IMemberService _memberService;
+    private readonly ITrainerService _trainerService;
     private readonly IDialogService _dialogs;
     private readonly INavigationService _navigation;
     private readonly IServiceProvider _services;
@@ -43,6 +51,7 @@ public partial class MemberDetailViewModel : ObservableObject, IAsyncInitializab
         _members = members;
         _trainers = trainers;
         _memberService = memberService;
+        _trainerService = services.GetRequiredService<ITrainerService>();
         _dialogs = dialogs;
         _navigation = navigation;
         _services = services;
@@ -52,20 +61,21 @@ public partial class MemberDetailViewModel : ObservableObject, IAsyncInitializab
         CanManage = currentUser.IsInRole(UserRole.Admin, UserRole.Resepsionis);
     }
 
-    /// <summary>Admin dan Resepsionis boleh mengubah data dan memperpanjang.</summary>
+    /// <summary>Admin dan Resepsionis boleh mengubah data, menugaskan PT, dan memperpanjang.</summary>
     public bool CanManage { get; }
 
     public ObservableCollection<TransactionHistoryRowDto> Transactions { get; } = new();
+    public ObservableCollection<TrainerOption> TrainerOptions { get; } = new();
 
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private string _errorMessage = "";
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanRenew), nameof(CanEdit))]
+    [NotifyPropertyChangedFor(nameof(CanRenew), nameof(CanEdit), nameof(CanAssign), nameof(CanEndAssignment))]
     private bool _isLoaded;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanRenew))]
+    [NotifyPropertyChangedFor(nameof(CanRenew), nameof(CanAssign), nameof(CanEndAssignment))]
     private bool _isActive;
 
     [ObservableProperty] private string _namaLengkap = "";
@@ -84,10 +94,22 @@ public partial class MemberDetailViewModel : ObservableObject, IAsyncInitializab
     [ObservableProperty] private string _instruktur = "-";
     [ObservableProperty] private bool _hasNoTransactions;
 
+    [ObservableProperty] private TrainerOption? _selectedTrainerOption;
+    [ObservableProperty] private string _assignError = "";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanEndAssignment))]
+    private bool _hasTrainer;
+
     public bool CanEdit => CanManage && IsLoaded;
 
     /// <summary>Member nonaktif tidak bisa diperpanjang (TransactionService menolaknya).</summary>
     public bool CanRenew => CanManage && IsLoaded && IsActive;
+
+    /// <summary>Member nonaktif tidak bisa ditugaskan PT (TrainerService menolaknya).</summary>
+    public bool CanAssign => CanManage && IsLoaded && IsActive;
+
+    public bool CanEndAssignment => CanAssign && HasTrainer;
 
     public async Task InitializeAsync()
     {
@@ -130,11 +152,22 @@ public partial class MemberDetailViewModel : ObservableObject, IAsyncInitializab
             Instruktur = pt is null
                 ? "Belum ada instruktur"
                 : $"{pt.NamaTrainer} (sejak {pt.TglMulai.ToString("dd MMM yyyy", Id)})";
+            HasTrainer = pt is not null;
+
+            if (CanManage)
+            {
+                var trainers = await _trainers.GetAllAsync(includeInactive: false);
+                TrainerOptions.Clear();
+                foreach (var t in trainers)
+                    TrainerOptions.Add(new TrainerOption(t.TrainerId, t.Nama, t.Keahlian));
+                SelectedTrainerOption = TrainerOptions.FirstOrDefault(o => o.TrainerId == pt?.TrainerId);
+            }
 
             Transactions.Clear();
             foreach (var row in transaksi)
                 Transactions.Add(row);
             HasNoTransactions = transaksi.Count == 0;
+            AssignError = "";
             IsLoaded = true;
         }
         catch (Exception ex)
@@ -192,5 +225,75 @@ public partial class MemberDetailViewModel : ObservableObject, IAsyncInitializab
         var transaksi = _services.GetRequiredService<NewTransactionViewModel>();
         _navigation.NavigateTo(transaksi);
         transaksi.SearchText = KodeMember;
+    }
+
+    /// <summary>FR-10: penugasan baru otomatis mengakhiri penugasan aktif sebelumnya.</summary>
+    [RelayCommand]
+    private async Task AssignAsync()
+    {
+        if (!CanAssign)
+            return;
+        if (SelectedTrainerOption is not { } option)
+        {
+            AssignError = "Pilih instruktur terlebih dahulu.";
+            return;
+        }
+
+        IsBusy = true;
+        AssignError = "";
+        try
+        {
+            var result = await _trainerService.AssignAsync(_memberId, option.TrainerId);
+            if (!result.Success)
+            {
+                AssignError = result.Message;
+                return;
+            }
+
+            _dialogs.Info("Instruktur", result.Message);
+            await InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error(ex, "MemberDetailViewModel.Assign");
+            AssignError = "Penugasan gagal disimpan. Periksa koneksi database, lalu coba lagi.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task EndAssignmentAsync()
+    {
+        if (!CanEndAssignment)
+            return;
+        if (!_dialogs.Confirm("Akhiri penugasan", $"Akhiri penugasan instruktur untuk {NamaLengkap}?", "Akhiri", isDanger: true))
+            return;
+
+        IsBusy = true;
+        AssignError = "";
+        try
+        {
+            var result = await _trainerService.EndAssignmentAsync(_memberId);
+            if (!result.Success)
+            {
+                AssignError = result.Message;
+                return;
+            }
+
+            _dialogs.Info("Instruktur", result.Message);
+            await InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error(ex, "MemberDetailViewModel.EndAssignment");
+            AssignError = "Penugasan gagal diakhiri. Periksa koneksi database, lalu coba lagi.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
