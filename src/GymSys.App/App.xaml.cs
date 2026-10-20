@@ -87,15 +87,15 @@ public partial class App : Application
             services.AddSingleton<IAuthService, FakeAuthService>();
             services.AddSingleton<IAccountService, FakeAccountService>();
             services.AddSingleton<ITransactionRepository, FakeTransactionRepository>();
+
+            // Anggota 3: data palsu Member, Paket, Instruktur
+            services.AddSingleton<FakeMasterDataStore>();
+            services.AddSingleton<IMemberRepository, FakeMemberRepository>();
+            services.AddSingleton<IPlanRepository, FakePlanRepository>();
+            services.AddSingleton<ITrainerRepository, FakeTrainerRepository>();
         }
 
-        // --- Anggota 3: Member, Paket, Instruktur ---
-        // SEMENTARA selalu memakai data palsu sampai repository EF Core asli selesai;
-        // setelah itu ketiga repository pindah ke AddGymSysData dan baris Fake ini masuk ke blok else di atas.
-        services.AddSingleton<FakeMasterDataStore>();
-        services.AddSingleton<IMemberRepository, FakeMemberRepository>();
-        services.AddSingleton<IPlanRepository, FakePlanRepository>();
-        services.AddSingleton<ITrainerRepository, FakeTrainerRepository>();
+        // --- Anggota 3: service Member, Paket, Instruktur (aturan bisnis + cek peran) ---
         services.AddSingleton<IMemberService, MemberService>();
         services.AddSingleton<IPlanService, PlanService>();
         services.AddSingleton<ITrainerService, TrainerService>();
