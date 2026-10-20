@@ -62,6 +62,7 @@
                                           VerticalAlignment="Center" HorizontalAlignment="Left"
                                           Content="{TemplateBinding SelectionBoxItem}"
                                           ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
                                           ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"/>
                         <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}"
                                Placement="Bottom" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">

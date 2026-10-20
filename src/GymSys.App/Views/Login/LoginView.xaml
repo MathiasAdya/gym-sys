@@ -48,9 +48,6 @@
                 <ProgressBar IsIndeterminate="True" Height="3" Margin="0,12,0,0" BorderThickness="0"
                              Foreground="{DynamicResource AccentBrush}" Background="{DynamicResource LineBrush}"
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
-
-                <TextBlock Style="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,28,0,0"
-                           Text="Akun demo: admin / admin123, resepsionis / resep123, pt / pt123"/>
             </StackPanel>
         </Grid>
     </Grid>
