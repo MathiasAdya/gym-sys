@@ -109,5 +109,6 @@ public partial class App : Application
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<NewTransactionViewModel>();
         services.AddTransient<TransactionHistoryViewModel>();
+        services.AddTransient<MembersViewModel>();
     }
 }

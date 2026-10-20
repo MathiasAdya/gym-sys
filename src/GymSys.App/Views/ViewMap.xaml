@@ -44,4 +44,8 @@
         <views:ReceiptView/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:MembersViewModel}">
+        <views:MembersView/>
+    </DataTemplate>
+
 </ResourceDictionary>

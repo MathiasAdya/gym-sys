@@ -101,7 +101,7 @@ public partial class ShellViewModel : ObservableObject
     private void BuildMenu(UserRole role)
     {
         MenuItems.Add(new("Dashboard", "🏠", () => _services.GetRequiredService<DashboardViewModel>()));
-        MenuItems.Add(new("Member", "👥", () => new PlaceholderViewModel("Member", "Anggota 3")));
+        MenuItems.Add(new("Member", "👥", () => _services.GetRequiredService<MembersViewModel>()));
 
         if (role != UserRole.Instruktur)
         {
