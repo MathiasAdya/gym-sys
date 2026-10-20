@@ -110,5 +110,6 @@ public partial class App : Application
         services.AddTransient<NewTransactionViewModel>();
         services.AddTransient<TransactionHistoryViewModel>();
         services.AddTransient<MembersViewModel>();
+        services.AddTransient<PlansViewModel>();
     }
 }

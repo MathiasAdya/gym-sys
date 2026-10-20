@@ -52,4 +52,8 @@
         <views:MemberFormView/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:PlansViewModel}">
+        <views:PlansView/>
+    </DataTemplate>
+
 </ResourceDictionary>
