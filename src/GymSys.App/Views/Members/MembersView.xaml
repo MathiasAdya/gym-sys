@@ -65,7 +65,8 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <DataGrid ItemsSource="{Binding Rows}"
+                    <DataGrid x:Name="MembersGrid" ItemsSource="{Binding Rows}"
+                              MouseDoubleClick="OnRowDoubleClick"
                               AutoGenerateColumns="False" IsReadOnly="True"
                               EnableRowVirtualization="True"
                               VirtualizingPanel.IsVirtualizing="True"
@@ -100,13 +101,18 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Aksi" Width="100">
+                            <DataGridTemplateColumn Header="Aksi" Width="170">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Ubah" Style="{StaticResource GhostButton}" Padding="10,4"
-                                                Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                CommandParameter="{Binding}"
-                                                Visibility="{Binding DataContext.CanManage, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BoolToVis}}"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Detail" Style="{StaticResource GhostButton}" Padding="10,4"
+                                                    Command="{Binding DataContext.DetailCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                            <Button Content="Ubah" Style="{StaticResource GhostButton}" Padding="10,4" Margin="6,0,0,0"
+                                                    Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"
+                                                    Visibility="{Binding DataContext.CanManage, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BoolToVis}}"/>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

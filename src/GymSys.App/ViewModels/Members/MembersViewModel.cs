@@ -28,6 +28,7 @@ public partial class MembersViewModel : ObservableObject, IAsyncInitializable
     private readonly ICurrentUserService _currentUser;
     private readonly IDialogService _dialogs;
     private readonly INavigationService _navigation;
+    private readonly IServiceProvider _services;
     private readonly TimeProvider _time;
 
     private int _loadVersion;
@@ -41,6 +42,7 @@ public partial class MembersViewModel : ObservableObject, IAsyncInitializable
         ICurrentUserService currentUser,
         IDialogService dialogs,
         INavigationService navigation,
+        IServiceProvider services,
         TimeProvider time)
     {
         _members = members;
@@ -49,6 +51,7 @@ public partial class MembersViewModel : ObservableObject, IAsyncInitializable
         _currentUser = currentUser;
         _dialogs = dialogs;
         _navigation = navigation;
+        _services = services;
         _time = time;
         IsInstruktur = currentUser.IsInRole(UserRole.Instruktur);
         CanManage = currentUser.IsInRole(UserRole.Admin, UserRole.Resepsionis);
@@ -138,6 +141,17 @@ public partial class MembersViewModel : ObservableObject, IAsyncInitializable
     {
         if (row is not null && CanManage)
             OpenForm(row.MemberId);
+    }
+
+    /// <summary>Tombol Detail dan klik dua kali baris. Semua peran boleh melihat detail member di daftarnya.</summary>
+    [RelayCommand]
+    private void Detail(MemberListRowDto? row)
+    {
+        if (row is null)
+            return;
+        _navigation.NavigateTo(new MemberDetailViewModel(
+            _members, _trainers, _memberService, _currentUser, _dialogs, _navigation, _services, _time,
+            row.MemberId, () => _navigation.NavigateTo(this)));
     }
 
     /// <summary>Kembali dari form langsung ke daftar ini (filter dan halaman tetap), lalu daftar dimuat ulang.</summary>
