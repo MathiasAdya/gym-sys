@@ -24,7 +24,10 @@ public partial class MembersViewModel : ObservableObject, IAsyncInitializable
 
     private readonly IMemberRepository _members;
     private readonly ITrainerRepository _trainers;
+    private readonly IMemberService _memberService;
     private readonly ICurrentUserService _currentUser;
+    private readonly IDialogService _dialogs;
+    private readonly INavigationService _navigation;
     private readonly TimeProvider _time;
 
     private int _loadVersion;
@@ -34,12 +37,18 @@ public partial class MembersViewModel : ObservableObject, IAsyncInitializable
     public MembersViewModel(
         IMemberRepository members,
         ITrainerRepository trainers,
+        IMemberService memberService,
         ICurrentUserService currentUser,
+        IDialogService dialogs,
+        INavigationService navigation,
         TimeProvider time)
     {
         _members = members;
         _trainers = trainers;
+        _memberService = memberService;
         _currentUser = currentUser;
+        _dialogs = dialogs;
+        _navigation = navigation;
         _time = time;
         IsInstruktur = currentUser.IsInRole(UserRole.Instruktur);
         CanManage = currentUser.IsInRole(UserRole.Admin, UserRole.Resepsionis);
@@ -48,7 +57,7 @@ public partial class MembersViewModel : ObservableObject, IAsyncInitializable
 
     public bool IsInstruktur { get; }
 
-    /// <summary>Admin dan Resepsionis boleh menambah/mengubah member (dipakai mulai Langkah 4).</summary>
+    /// <summary>Admin dan Resepsionis boleh menambah, mengubah, dan menonaktifkan member.</summary>
     public bool CanManage { get; }
 
     public IReadOnlyList<MemberStatusOption> StatusOptions { get; } = new MemberStatusOption[]
@@ -119,6 +128,22 @@ public partial class MembersViewModel : ObservableObject, IAsyncInitializable
 
     [RelayCommand]
     private Task RetryAsync() => InitializeAsync();
+
+    /// <summary>Tombol Tambah Member dan shortcut Ctrl+N.</summary>
+    [RelayCommand(CanExecute = nameof(CanManage))]
+    private void Add() => OpenForm(null);
+
+    [RelayCommand]
+    private void Edit(MemberListRowDto? row)
+    {
+        if (row is not null && CanManage)
+            OpenForm(row.MemberId);
+    }
+
+    /// <summary>Kembali dari form langsung ke daftar ini (filter dan halaman tetap), lalu daftar dimuat ulang.</summary>
+    private void OpenForm(int? memberId) =>
+        _navigation.NavigateTo(new MemberFormViewModel(
+            _memberService, _members, _dialogs, _time, memberId, () => _navigation.NavigateTo(this)));
 
     private async Task LoadAsync()
     {

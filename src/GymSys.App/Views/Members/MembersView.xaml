@@ -25,24 +25,31 @@
                 </DockPanel>
             </Border>
 
-            <!-- Pencarian dan filter -->
+            <!-- Pencarian, filter, dan tombol tambah -->
             <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,16" Padding="20,16">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="Cari member (Ctrl+F)" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
-                            <controls:SearchBox x:Name="Search"
-                                                Placeholder="Cari kode, nama, atau No. HP"
-                                                SearchText="{Binding SearchText, Mode=TwoWay}"
-                                                Command="{Binding SearchCommand}"
-                                                Width="320"/>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="+ Tambah Member"
+                                ToolTip="Tambah member baru (Ctrl+N)"
+                                Command="{Binding AddCommand}"
+                                Style="{StaticResource PrimaryButton}" VerticalAlignment="Bottom"
+                                Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="Cari member (Ctrl+F)" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                                <controls:SearchBox x:Name="Search"
+                                                    Placeholder="Cari kode, nama, atau No. HP"
+                                                    SearchText="{Binding SearchText, Mode=TwoWay}"
+                                                    Command="{Binding SearchCommand}"
+                                                    Width="320"/>
+                            </StackPanel>
+                            <StackPanel Width="200">
+                                <TextBlock Text="Status" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
+                                <ComboBox ItemsSource="{Binding StatusOptions}" DisplayMemberPath="Title"
+                                          SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"/>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Width="200">
-                            <TextBlock Text="Status" Style="{StaticResource Muted}" Margin="0,0,0,4"/>
-                            <ComboBox ItemsSource="{Binding StatusOptions}" DisplayMemberPath="Title"
-                                      SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"/>
-                        </StackPanel>
-                    </StackPanel>
+                    </DockPanel>
 
                     <TextBlock Text="Hanya menampilkan member yang ditugaskan kepada Anda."
                                Style="{StaticResource Muted}" Margin="0,10,0,0"
@@ -64,12 +71,12 @@
                               VirtualizingPanel.IsVirtualizing="True"
                               VirtualizingPanel.VirtualizationMode="Recycling">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Kode" Binding="{Binding KodeMember}" Width="Auto"/>
-                            <DataGridTextColumn Header="Nama" Binding="{Binding NamaLengkap}" Width="*"/>
-                            <DataGridTextColumn Header="No. HP" Binding="{Binding NoTelepon}" Width="Auto"/>
-                            <DataGridTextColumn Header="Berakhir" Width="Auto"
+                            <DataGridTextColumn Header="Kode" Binding="{Binding KodeMember}" Width="140"/>
+                            <DataGridTextColumn Header="Nama" Binding="{Binding NamaLengkap}" Width="*" MinWidth="180"/>
+                            <DataGridTextColumn Header="No. HP" Binding="{Binding NoTelepon}" Width="150"/>
+                            <DataGridTextColumn Header="Berakhir" Width="130"
                                                 Binding="{Binding TglBerakhirTerakhir, StringFormat='dd MMM yyyy', ConverterCulture=id-ID, TargetNullValue='-'}"/>
-                            <DataGridTemplateColumn Header="Status" Width="Auto">
+                            <DataGridTemplateColumn Header="Status" Width="170">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding StatusLabel}" FontWeight="SemiBold" VerticalAlignment="Center">
@@ -90,6 +97,16 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Aksi" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Ubah" Style="{StaticResource GhostButton}" Padding="10,4"
+                                                Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}"
+                                                Visibility="{Binding DataContext.CanManage, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BoolToVis}}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

@@ -48,4 +48,8 @@
         <views:MembersView/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:MemberFormViewModel}">
+        <views:MemberFormView/>
+    </DataTemplate>
+
 </ResourceDictionary>
