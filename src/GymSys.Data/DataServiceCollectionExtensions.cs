@@ -21,6 +21,11 @@ public static class DataServiceCollectionExtensions
         services.AddSingleton<IReportQueries, ReportQueries>();
         services.AddSingleton<IUserRepository, UserRepository>();
         services.AddSingleton<ITransactionRepository, TransactionRepository>();
+
+        // Anggota 3: Member, Paket, Instruktur
+        services.AddSingleton<IMemberRepository, MemberRepository>();
+        services.AddSingleton<IPlanRepository, PlanRepository>();
+        services.AddSingleton<ITrainerRepository, TrainerRepository>();
         return services;
     }
 }

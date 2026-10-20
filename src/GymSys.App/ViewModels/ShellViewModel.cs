@@ -101,7 +101,7 @@ public partial class ShellViewModel : ObservableObject
     private void BuildMenu(UserRole role)
     {
         MenuItems.Add(new("Dashboard", "🏠", () => _services.GetRequiredService<DashboardViewModel>()));
-        MenuItems.Add(new("Member", "👥", () => new PlaceholderViewModel("Member", "Anggota 3")));
+        MenuItems.Add(new("Member", "👥", () => _services.GetRequiredService<MembersViewModel>()));
 
         if (role != UserRole.Instruktur)
         {
@@ -109,8 +109,8 @@ public partial class ShellViewModel : ObservableObject
             MenuItems.Add(new("Riwayat Transaksi", "🧾", () => _services.GetRequiredService<TransactionHistoryViewModel>()));
         }
 
-        MenuItems.Add(new("Paket", "🏷", () => new PlaceholderViewModel("Paket", "Anggota 3")));
-        MenuItems.Add(new("Instruktur", "🏋", () => new PlaceholderViewModel("Instruktur", "Anggota 3")));
+        MenuItems.Add(new("Paket", "🏷", () => _services.GetRequiredService<PlansViewModel>()));
+        MenuItems.Add(new("Instruktur", "🏋", () => _services.GetRequiredService<TrainersViewModel>()));
 
         if (role != UserRole.Instruktur)
             MenuItems.Add(new("Laporan", "📊", () => _services.GetRequiredService<ReportViewModel>()));

@@ -87,7 +87,18 @@ public partial class App : Application
             services.AddSingleton<IAuthService, FakeAuthService>();
             services.AddSingleton<IAccountService, FakeAccountService>();
             services.AddSingleton<ITransactionRepository, FakeTransactionRepository>();
+
+            // Anggota 3: data palsu Member, Paket, Instruktur
+            services.AddSingleton<FakeMasterDataStore>();
+            services.AddSingleton<IMemberRepository, FakeMemberRepository>();
+            services.AddSingleton<IPlanRepository, FakePlanRepository>();
+            services.AddSingleton<ITrainerRepository, FakeTrainerRepository>();
         }
+
+        // --- Anggota 3: service Member, Paket, Instruktur (aturan bisnis + cek peran) ---
+        services.AddSingleton<IMemberService, MemberService>();
+        services.AddSingleton<IPlanService, PlanService>();
+        services.AddSingleton<ITrainerService, TrainerService>();
 
         // --- ViewModel ---
         services.AddSingleton<MainWindowViewModel>();
@@ -98,5 +109,8 @@ public partial class App : Application
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<NewTransactionViewModel>();
         services.AddTransient<TransactionHistoryViewModel>();
+        services.AddTransient<MembersViewModel>();
+        services.AddTransient<PlansViewModel>();
+        services.AddTransient<TrainersViewModel>();
     }
 }

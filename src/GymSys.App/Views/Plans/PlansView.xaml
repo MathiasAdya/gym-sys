@@ -1,0 +1,169 @@
+<UserControl x:Class="GymSys.App.Views.PlansView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GymSys.App.Controls"
+             xmlns:core="clr-namespace:GymSys.Core.Services;assembly=GymSys.Core">
+
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Banner error memuat -->
+            <Border Grid.Row="0" Style="{StaticResource Card}" BorderBrush="{DynamicResource DangerBrush}"
+                    Margin="0,0,0,16" Padding="16"
+                    Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVis}}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Coba lagi" Command="{Binding RetryCommand}"/>
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource DangerBrush}"
+                               VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,16,0"/>
+                </DockPanel>
+            </Border>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Daftar paket -->
+                <Border Grid.Column="0" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Hanya Admin yang dapat menambah atau mengubah paket."
+                                   Style="{StaticResource Muted}" Margin="0,0,0,12"
+                                   Visibility="{Binding IsViewOnly, Converter={StaticResource BoolToVis}}"/>
+
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding Rows}"
+                                  AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nama paket" Binding="{Binding NamaPaket}" Width="180"/>
+                                <DataGridTextColumn Header="Deskripsi" Binding="{Binding Deskripsi}" Width="*" MinWidth="120"/>
+                                <DataGridTextColumn Header="Durasi" Width="90"
+                                                    Binding="{Binding DurasiHari, StringFormat='{}{0} hari'}"/>
+                                <DataGridTextColumn Header="Harga" Width="130"
+                                                    Binding="{Binding Harga, StringFormat=C0, ConverterCulture=id-ID}"/>
+                                <DataGridTemplateColumn Header="Status" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock FontWeight="SemiBold" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="Aktif"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                                <Setter Property="Text" Value="Nonaktif"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Aksi" Width="90">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Ubah" Style="{StaticResource GhostButton}" Padding="10,4"
+                                                    Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"
+                                                    Visibility="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BoolToVis}}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <TextBlock Grid.Row="1" Text="Belum ada paket."
+                                   Style="{StaticResource Muted}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"/>
+                    </Grid>
+                </Border>
+
+                <!-- Form (Admin) -->
+                <Border Grid.Column="1" Style="{StaticResource Card}" Width="360" Margin="16,0,0,0" Padding="20"
+                        VerticalAlignment="Top"
+                        Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="{Binding FormTitle}" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="{Binding EditHint}" Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                   Visibility="{Binding EditHint, Converter={StaticResource StringToVis}}"/>
+                        <TextBlock Text="{Binding FormError}" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" Margin="0,8,0,0"
+                                   Visibility="{Binding FormError, Converter={StaticResource StringToVis}}"/>
+
+                        <TextBlock Text="Nama paket *" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                        <TextBox x:Name="NamaBox"
+                                 Text="{Binding NamaPaket, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="{x:Static core:MasterDataRules.MaksPanjangNamaPaket}"/>
+                        <TextBlock Text="{Binding (Validation.Errors)/ErrorContent, ElementName=NamaBox}"
+                                   Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" Margin="0,4,0,8"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Durasi (hari) *" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                <TextBox x:Name="DurasiBox" MaxLength="4"
+                                         Text="{Binding DurasiHariText, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="{Binding (Validation.Errors)/ErrorContent, ElementName=DurasiBox}"
+                                           Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" Margin="0,4,0,8"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Harga (Rp) *" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                <TextBox x:Name="HargaBox" MaxLength="14"
+                                         Text="{Binding HargaText, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="{Binding (Validation.Errors)/ErrorContent, ElementName=HargaBox}"
+                                           Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" Margin="0,4,0,8"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Deskripsi" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <TextBox Text="{Binding Deskripsi, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="{x:Static core:PlanService.MaksPanjangDeskripsi}"
+                                 AcceptsReturn="True" TextWrapping="Wrap" Height="72"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <Button Content="Simpan" Command="{Binding SaveCommand}"
+                                    Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"/>
+                            <Button Content="Batal" Command="{Binding CancelEditCommand}"
+                                    Style="{StaticResource GhostButton}"
+                                    Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"/>
+                        </StackPanel>
+
+                        <!-- Aksi untuk paket yang sedang diubah -->
+                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0"
+                                Margin="0,20,0,0" Padding="0,16,0,0"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding EditingStatusText}" Style="{StaticResource Muted}"
+                                           TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                <WrapPanel>
+                                    <Button Content="{Binding ToggleActiveText}" Command="{Binding ToggleActiveCommand}"
+                                            Style="{StaticResource GhostButton}" Margin="0,0,8,8"/>
+                                    <Button Content="Hapus Paket" Command="{Binding DeleteCommand}"
+                                            Style="{StaticResource DangerButton}" Margin="0,0,8,8"
+                                            Visibility="{Binding CanDelete, Converter={StaticResource BoolToVis}}"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <controls:LoadingOverlay Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+    </Grid>
+</UserControl>

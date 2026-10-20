@@ -44,4 +44,24 @@
         <views:ReceiptView/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:MembersViewModel}">
+        <views:MembersView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:MemberFormViewModel}">
+        <views:MemberFormView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PlansViewModel}">
+        <views:PlansView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:MemberDetailViewModel}">
+        <views:MemberDetailView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:TrainersViewModel}">
+        <views:TrainersView/>
+    </DataTemplate>
+
 </ResourceDictionary>

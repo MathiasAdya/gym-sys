@@ -1,0 +1,187 @@
+<UserControl x:Class="GymSys.App.Views.TrainersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GymSys.App.Controls"
+             xmlns:core="clr-namespace:GymSys.Core.Services;assembly=GymSys.Core">
+
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Banner error memuat -->
+            <Border Grid.Row="0" Style="{StaticResource Card}" BorderBrush="{DynamicResource DangerBrush}"
+                    Margin="0,0,0,16" Padding="16"
+                    Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVis}}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Coba lagi" Command="{Binding RetryCommand}"/>
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource DangerBrush}"
+                               VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,16,0"/>
+                </DockPanel>
+            </Border>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Daftar instruktur -->
+                    <Border Grid.Row="0" Style="{StaticResource Card}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="{Binding ViewOnlyText}" Style="{StaticResource Muted}"
+                                       TextWrapping="Wrap" Margin="0,0,0,12"
+                                       Visibility="{Binding IsViewOnly, Converter={StaticResource BoolToVis}}"/>
+
+                            <DataGrid Grid.Row="1" ItemsSource="{Binding Rows}"
+                                      SelectedItem="{Binding SelectedTrainer, Mode=TwoWay}"
+                                      AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nama" Binding="{Binding Nama}" Width="*" MinWidth="130"/>
+                                    <DataGridTextColumn Header="No. HP" Binding="{Binding NoTelepon, TargetNullValue='-'}" Width="130"/>
+                                    <DataGridTextColumn Header="Keahlian" Binding="{Binding Keahlian, TargetNullValue='-'}" Width="*" MinWidth="120"/>
+                                    <DataGridTextColumn Header="Akun" Binding="{Binding Username, TargetNullValue='-'}" Width="100"/>
+                                    <DataGridTextColumn Header="Member" Binding="{Binding JumlahMemberAktif}" Width="80"/>
+                                    <DataGridTemplateColumn Header="Status" Width="90">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock FontWeight="SemiBold" VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="Aktif"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                                    <Setter Property="Text" Value="Nonaktif"/>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Aksi" Width="80">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Ubah" Style="{StaticResource GhostButton}" Padding="10,4"
+                                                        Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                        CommandParameter="{Binding}"
+                                                        Visibility="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BoolToVis}}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <TextBlock Grid.Row="1" Text="{Binding EmptyText}"
+                                       Style="{StaticResource Muted}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       TextWrapping="Wrap" TextAlignment="Center" Margin="24"
+                                       Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Member yang ditangani -->
+                    <Border Grid.Row="2" Style="{StaticResource Card}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="{Binding AssignedTitle}" Style="{StaticResource SectionTitle}"
+                                       TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                            <DataGrid Grid.Row="1" ItemsSource="{Binding AssignedMembers}"
+                                      AutoGenerateColumns="False" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Kode" Binding="{Binding KodeMember}" Width="140"/>
+                                    <DataGridTextColumn Header="Nama" Binding="{Binding NamaLengkap}" Width="*" MinWidth="140"/>
+                                    <DataGridTextColumn Header="No. HP" Binding="{Binding NoTelepon}" Width="150"/>
+                                    <DataGridTextColumn Header="Status" Binding="{Binding StatusLabel}" Width="160"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <TextBlock Grid.Row="1" Text="Belum ada member yang ditangani."
+                                       Style="{StaticResource Muted}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Visibility="{Binding HasNoAssignedMembers, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Form (Admin) -->
+                <Border Grid.Column="1" Style="{StaticResource Card}" Width="360" Margin="16,0,0,0" Padding="20"
+                        VerticalAlignment="Top"
+                        Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="{Binding FormTitle}" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="{Binding FormError}" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" Margin="0,8,0,0"
+                                   Visibility="{Binding FormError, Converter={StaticResource StringToVis}}"/>
+
+                        <TextBlock Text="Nama *" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                        <TextBox x:Name="NamaBox"
+                                 Text="{Binding Nama, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="{x:Static core:MasterDataRules.MaksPanjangNama}"/>
+                        <TextBlock Text="{Binding (Validation.Errors)/ErrorContent, ElementName=NamaBox}"
+                                   Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" Margin="0,4,0,8"/>
+
+                        <TextBlock Text="No. HP" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <TextBox x:Name="NoTeleponBox"
+                                 Text="{Binding NoTelepon, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="{x:Static core:MasterDataRules.MaksDigitTelepon}"/>
+                        <TextBlock Text="{Binding (Validation.Errors)/ErrorContent, ElementName=NoTeleponBox}"
+                                   Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" Margin="0,4,0,8"/>
+
+                        <TextBlock Text="Keahlian" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <TextBox Text="{Binding Keahlian, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="{x:Static core:TrainerService.MaksPanjangKeahlian}"/>
+                        <TextBlock Text="Mis. kekuatan, yoga, cardio" Style="{StaticResource Muted}"
+                                   FontSize="12" Margin="0,4,0,12"/>
+
+                        <TextBlock Text="Akun login" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <ComboBox ItemsSource="{Binding AccountOptions}" SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
+                        <TextBlock Text="Hubungkan ke akun berperan Instruktur agar ia bisa login dan melihat member-nya. Akun dibuat di Pengaturan."
+                                   Style="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <Button Content="Simpan" Command="{Binding SaveCommand}"
+                                    Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"/>
+                            <Button Content="Batal" Command="{Binding CancelEditCommand}"
+                                    Style="{StaticResource GhostButton}"
+                                    Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"/>
+                        </StackPanel>
+
+                        <!-- Aksi untuk instruktur yang sedang diubah -->
+                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0"
+                                Margin="0,20,0,0" Padding="0,16,0,0"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding EditingStatusText}" Style="{StaticResource Muted}"
+                                           TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                <Button Content="{Binding ToggleActiveText}" Command="{Binding ToggleActiveCommand}"
+                                        Style="{StaticResource GhostButton}" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <controls:LoadingOverlay Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+    </Grid>
+</UserControl>
